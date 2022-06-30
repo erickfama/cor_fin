@@ -1,0 +1,200 @@
+---
+title: "Reporte de resultados 2"
+author:
+- "Asistente de investigación: Erick Gabriel Fajardo Martínez"
+- "Investigador: Dr. Gabriel Purón Cid"
+
+date: '2022-06-29'
+fontsize: 12pt
+output:   
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+set.seed(123)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r librerias, echo=FALSE}
+# Libraries
+library(tidyverse)
+library(caret)
+library(xgboost)
+library(sf)
+```
+
+# Descripción de los modelos
+
+En este segundo intento se compara el desempeño de tres modelos entrenados. El primer modelo (percepción sin normalizar) fue creado utilizando la pregunta de percepción de la ENCIG para construir la clasificación de los municipios en corruptos y no corruptos. El segundo modelo (percepción) es similar al primero ya que también se utilizó la pregunta de percepción para construir la clasificación de corrupción, sin embargo, este modelo se entrenó con los datos normalizados y se añadieron dos variables explicativas más (grado promedio de escolaridad y población total). El tercer modelo (incidencia) es igual al segundo, es decir, también fue entrenado con los datos normalizados y variables explicativas adicionales; la diferencia está en la construcción de la clasificación de corrupción la cual fue hecha con la pregunta de incidencia de la ENCIG.
+
+Igual que en el primer reporte, para el primer modelo se cuenta con información de 233 municipios y 234 variables de egresos, las cuales están al nivel de partidas. Mientras que para los dos modelos nuevos de percepción e incidencia, se cuenta con información del mismo número de municipios y 236 variables. 
+
+## Normalización de los datos de egresos
+
+Atendiendo a lo comentado en la reunión con la Dra. Daniela Moctezuma, esta vez se procedió a la normalización de los datos. Los modelos de percepción e incidencia cuentan con esta normalización, la cual fue hecha de la siguiente manera:
+
+$$
+\begin{aligned}
+Z_{i} &= \frac{X_i}{PEA_i}\\
+\text{donde}:\ X &= \text{Partida de egresos},\ i = \text{Municipio}
+\end{aligned}
+$$
+
+## Clasificación de corrupción
+
+A diferencia del primer reporte donde la clasificación fue hecha de la siguiente manera:
+
+$$
+\begin{aligned}
+  Corrup =  \left\{
+    \begin{array}{@{}ll@{}}
+      1 \quad \text{si  proporción que contestó muy frecuente > 0}\\
+      0 \quad \text{si  proporción que contestó muy frecuente = 0}
+    \end{array}
+  \right.
+\end{aligned}
+$$
+
+En los modelos de percepción e incidencia se optó por probar con varios umbrales con el objetivo de encontrar aquel que **maximizara la sensibilidad del modelo**. Recordemos que la sensibilidad es la capacidad del modelo para clasificar un resultado positivo cuando este resultado es positivo en la realidad.
+
+En el modelo de percepción los umbrales corresponden a la proporción de encuestados que contestó que el fenómeno de corrupción es algo muy frecuente en su lugar de residencia, mientras que para el modelo de incidencia los umbrales corresponden a la proporción de encuestados que contestó que sí han estado involucrados en un acto de corrupción.
+
+# Curvas de precision y recall
+
+Para elegir el umbral óptimo en ambos modelos se calcularon entrenaron varios modelos para capturar y graficar sus valores de precision y recall. Ambas métricas permiten conocer la capacidad del modelo para clasificar correctamente los valores positivos, en este caso que los municipios sean corruptos. Ambos valores se encuentran entre 0 y 1, y se busca que ambos valores sean lo más cercano a 1.
+
+```{r precision-recall, echo=FALSE}
+# Lectura ----
+roc_per_noNorm <- read_csv(here::here("./data/2_interim/roc.csv"), locale = locale(encoding = "latin1"))
+roc_per <- read_csv(here::here("./data/2_interim/roc_per.csv"), locale = locale(encoding = "latin1"))
+roc_inc <- read_csv(here::here("./data/2_interim/roc_inc.csv"), locale = locale(encoding = "latin1"))
+
+# Plots ----
+
+# Merge data frames 
+roc <- rbind(roc_per_noNorm, roc_per, roc_inc)
+
+# plot 
+roc %>%
+  ggplot(aes(recall, precision, color = method)) +
+  geom_point() +
+  geom_line() +
+  ggrepel::geom_text_repel(aes(label = round(prop, 2)), size = 2) +
+  scale_x_continuous(limits = c(0, 1), breaks = scales::pretty_breaks(n = 5)) +
+  scale_y_continuous(limits = c(0, 1), breaks = scales::pretty_breaks(n = 5)) +
+  scale_color_discrete(name = "Modelo") +
+  theme_bw() +
+  labs(title = "Precision-Recall",
+       x = "Recall (sensitivity)",
+       y = "Precision",
+       caption = "Elaboración propia.")
+```
+
+# Comparación de los modelos
+
+Con base en las métricas de la siguiente tabla es posible percibir que cada modelo tiene sus ventajas y desventajas. 
+
+El primer modelo de percepción sin normalizar es bueno clasificando los municipios que no son corruptos (alta especificidad) y tiene un desempeño regular al clasificar los municipios corruptos (sensibilidad). 
+
+El segundo modelo de percepción tiene un buen desempeño al clasificar las dos categorías, es el modelo más balanceado. Sin embargo, el umbral óptimo para alcanzar este balance es 0, es decir, clasificar a los municipios como corruptos cuando la proporción de encuestados que respondió que la corrupción es un fenómeno muy frecuente sea mayor a 0. 
+
+El tercer modelo, el de incidencia, es muy bueno para clasificar los municipios corruptos, sin embargo, también asigna municipios que en realidad no son corruptos a esta categoría. Por lo tanto, es el modelo menos balanceado. 
+
+```{r comparacion, echo=FALSE}
+comp_models <- read_csv(here::here("./data/reports/2_comp_models.csv"), locale = locale(encoding = "latin1"))
+kableExtra::kable(comp_models, 
+                 align = "c", 
+                 format = "latex") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+# Mapas modelados
+
+```{r lectura_mapas, echo=FALSE}
+# Valores reales
+egresos_real <- read_csv(here::here("./data/3_final/egresos19_mun_clean.csv"))
+# Valores predichos
+egresos_predict <- read_csv(here::here("./data/3_final/egresos_predict.csv"))
+egresos_predict_PERINC <- read_csv(here::here("./data/3_final/egresos_predict_PERINC.csv"))
+
+# Lectura del mapa
+mun_mapa <- sf::read_sf(here::here("./data/maps/muni.shp"))
+
+# Merge ----
+
+# Se agregan las etiquetas reales y predichas
+mun_mapa <- mun_mapa %>% 
+  rename(mun_inegi = CVEGEO) %>%
+  left_join(select(egresos_real, c("mun_inegi", "corrup")), by = "mun_inegi") %>%
+  left_join(select(egresos_predict, c("mun_inegi", "corrup_hat")), by = "mun_inegi") %>%
+  left_join(select(egresos_predict_PERINC, c("mun_inegi", "corrup_hat_per", "corrup_hat_inc")), by = "mun_inegi") %>%
+  mutate(across(c(corrup_hat, corrup_hat_per, corrup_hat_inc), ~ ifelse(.x == "corrupto", 1, 0)),
+         across(c(corrup, corrup_hat, corrup_hat_per, corrup_hat_inc), ~ factor(.x, levels = c(1, 0), labels = c("corrupto", "no_corrupto"))))
+```
+
+## Mapa de valores reales
+
+```{r mapa_real, echo=FALSE}
+## Mapa de etiquetas reales ----
+mun_mapa %>%
+  ggplot(aes(fill = corrup)) +
+  geom_sf() +
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información")) +
+  theme_bw() +
+  labs(title = bquote("Clasificación"~bold("real")~"de corrupción de los municipios"),
+       subtitle = glue::glue("Total de municipios encuestados en la ENCIG: {nrow(egresos_real)}"),
+       caption = "Elaboración propia con datos de la ENCIG 2019.")
+
+```
+
+## Modelo de percepción sin normalizar
+
+```{r mapa_og, echo=FALSE}
+mun_mapa %>%
+  ggplot(aes(fill = corrup_hat)) +
+  geom_sf() +
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información")) +
+  theme_bw() +
+  labs(title = bquote("Clasificación"~bold("predicha")~"de corrupción de los municipios"),
+       subtitle = glue::glue("Total de municipios modelados: {nrow(egresos_predict)}\n
+                             Sensibilidad del modelo: 0.62 | Especificidad: 0.84"),
+       caption = "Elaboración propia con base en el algoritmo de Gradient Boosting.")
+
+```
+
+## Modelo de percepción
+
+```{r mapa_per, echo=FALSE}
+mun_mapa %>%
+  ggplot(aes(fill = factor(corrup_hat_per, levels = c("corrupto", "no_corrupto")))) +
+  geom_sf() +
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FFA600", "#00BFC4")) +
+  theme_bw() +
+  labs(title = bquote("Clasificación"~bold("predicha")~"de corrupción de los municipios"),
+       subtitle = glue::glue("Modelo de percepción\n
+                             Total de municipios modelados: {nrow(egresos_predict_PERINC)}\n
+                             Sensibilidad del modelo: {round(comp_models$Sensibilidad[comp_models$Modelo == 'Percepción'], 2)} | Especificidad: {round(comp_models$Especificidad[comp_models$Modelo == 'Percepción'], 2)}"),
+       caption = "Elaboración propia con base en el algoritmo de Gradient Boosting.")
+
+```
+
+
+## Modelo de incidencia
+
+```{r mapa_inc, echo=FALSE}
+mun_mapa %>%
+  ggplot(aes(fill = factor(corrup_hat_inc, levels = c("corrupto", "no_corrupto")))) +
+  geom_sf() +
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FF0000", "#00BFC4")) +
+  theme_bw() +
+  labs(title = bquote("Clasificación"~bold("predicha")~"de corrupción de los municipios"),
+       subtitle = glue::glue("Modelo de incidencia\n
+                             Total de municipios modelados: {nrow(egresos_predict_PERINC)}\n
+                             Sensibilidad del modelo: {round(comp_models$Sensibilidad[comp_models$Modelo == 'Incidencia'], 2)} | Especificidad: {round(comp_models$Especificidad[comp_models$Modelo == 'Incidencia'], 2)}"),
+       caption = "Elaboración propia con base en el algoritmo de Gradient Boosting.")
+
+```
+
+
+

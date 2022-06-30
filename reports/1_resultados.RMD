@@ -1,0 +1,209 @@
+---
+title: "Reporte de resultados"
+subtitle: "Gradient Boosting VS Logit"
+author: "Erick Fajardo"
+fontsize: 12pt
+output:   
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+set.seed(123)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r librerias}
+# Libraries
+library(tidyverse)
+library(caret)
+library(xgboost)
+```
+
+# Descripción de los datos
+
+```{r lectura}
+# Base de datos
+egresos <- read_csv(here::here("./data/3_final/egresos19_mun_clean.csv")) %>%
+  mutate(corrup = factor(ifelse(prop_corrup > 0, "corrupto", "no_corrupto"))) %>%
+  select(starts_with("partida"), corrup)
+
+# Train y test sets
+training_samples <- egresos$corrup %>% 
+  createDataPartition(p = 0.7, list = FALSE)
+train_set  <- egresos[training_samples, ]
+test_set <- egresos[-training_samples, ]
+```
+
+En este primer intento se compara el desempeño del algoritmo Gradient Boosting contra una Regresión Logística.
+
+Ambos algoritmos son utilizados para clasificar a los municipios de acuerdo con su estructura de egresos. En total se cuenta con información de 233 municipios y 234 variables de egresos, las cuales están al nivel de partidas.
+
+```{r, echo=FALSE}
+kableExtra::kable(head(egresos %>% select(c(1), corrup)), align = "c", format = "latex") %>%
+  kableExtra::kable_styling(position = "center")
+```
+
+Los municipios fueron clasificados en corruptos y no corruptos con base en la proporción de la población que contestó que la corrupción es un fenómeno muy presente en su entidad de residencia (ECIG, 2019).Se asignó el valor de 1 (corrupto) si la proporción es mayor a 1 y 0 (no corrupto) en caso contrario:
+
+$$
+\begin{aligned}
+  Corrup =  \left\{
+    \begin{array}{@{}ll@{}}
+      1 \quad \text{si  proporción que contestó muy frecuente > 0}\\
+      0 \quad \text{si  proporción que contestó muy frecuente = 0}
+    \end{array}
+  \right.
+\end{aligned}
+$$
+
+Esta clasificación se hizo con la finalidad de evitar un problema de sesgo por prevalencia, el cual se presenta cuando la prevalencia de la viariable de resultados (en este caso corrupción) es muy cercana ya sea a 0 o 1. Con esta regla de clasificación se obtiene una prevalencia de:
+
+```{r prevalencia}
+# Prevalencia de municipios corruptos
+round(mean(egresos$corrup == "corrupto"), 4)
+```
+
+# Gradient Boosting 
+
+```{r GB_train, warning=FALSE, message=FALSE, results='hide'}
+# Train Gradient boosting
+model_xgbTree <- train(
+  corrup ~ ., data = train_set, method = "xgbTree",
+  trControl = trainControl("cv", number = 5)
+)
+
+# Predictions
+y_hat_xgbTree <- model_xgbTree %>% predict(test_set)
+```
+
+## Evaluación
+
+Este algoritmo presenta una precisión de 0.72, la cual es buena, además de contar con valores balanceados de sensitividad (habilidad del algoritmos para predecir valores positivos que sí son positivos) y especificidad (habilidad del algoritmo para predecir valores negativos que sí son negativos) que, a su vez, son buenos. El intervalo de confianza cuenta con un bajo valor-p, por lo que es posible confiar en los resultados del algoritmo. 
+
+```{r evaluacion_xgbTree, echo=FALSE}
+# Overall Accuracy
+accuracy_xgbTree <- mean(y_hat_xgbTree == test_set$corrup)
+
+# RSME 
+y_hat_xgbTree_bin <- ifelse(y_hat_xgbTree == "corrupto", 1, 0)
+y <- ifelse(test_set$corrup == "corrupto", 1, 0)
+rmse_xgbTree <- sqrt(sum((y_hat_xgbTree_bin - y)^2)/nrow(test_set))
+
+# F1-score
+F1_xgbTree <- F_meas(y_hat_xgbTree, reference = test_set$corrup)
+
+# Confusion matrix
+confusionMatrix(y_hat_xgbTree, reference = test_set$corrup)
+```
+
+# Regresión Logística
+
+```{r train_logit}
+# Train 
+model_Logit <- glm(corrup ~ ., data = train_set, family = "binomial")
+
+# Predictions
+y_hat_logit <- model_Logit %>% predict(test_set, type = "response") # type = "response" es muy importante 
+
+# To factor
+y_hat_logit <- ifelse(y_hat_logit > 0.5, "corrupto", "no_corrupto") %>%
+  factor()
+
+# Binary predictions
+y_hat_logit_bin <- ifelse(y_hat_logit == "corrupto", 1, 0)
+```
+
+## Evaluación
+
+La regresión logística cuenta con una precisión de 0.49, la cual no es buena, y a pesar de que sus valores de sensitividad y especificidad son balanceados, no destaca en ninguno de los dos. Es importante notar que el intervalo de confianza cuenta con un valor-p muy alto, por lo que en términos de inferencia no es posible confiar en este modelo.
+
+```{r evaluacion_logit, echo=FALSE}
+# Overall Acurracy
+accuracy_logit <- mean(y_hat_logit == test_set$corrup)
+
+# RMSE
+rmse_logit <- sqrt(sum((y_hat_logit_bin - ifelse(test_set$corrup == "corrupto", 1, 0))^2)/nrow(test_set))
+
+# F1-score
+F1_logit <- F_meas(y_hat_logit, reference = test_set$corrup)
+
+# Confusion Matrix
+confusionMatrix(y_hat_logit, reference = test_set$corrup)
+```
+
+# Comparación 
+
+En la siguiente tabla se observa que las métricas de evaluación son mejores en el algoritmo Gradient Boosting, dado que obtiene una mayor precisión y un mayor puntaje F1, mientras que cuenta con un RMSE menor. 
+
+```{r comparacion, echo=FALSE}
+kableExtra::kable(data.frame(Algoritmo = c("Gradient Boosting", "Logit"),
+                 Accuracy = round(c(accuracy_xgbTree, accuracy_logit), 4),
+                 RMSE = round(c(rmse_xgbTree, rmse_logit), 4),
+                 F1_score = round(c(F1_xgbTree, F1_logit), 4)), align = "c", format = "latex") %>%
+  kableExtra::kable_styling(position = "center", latex_options = "HOLD_position")
+```
+
+## Variables de importancia 
+
+### Gradient Boosting
+
+Las 10 partidas de egresos que más influencia tienen en la corrupción de acuerdo a Gradient Boosting:
+
+```{r var_imp_gb, echo=FALSE}
+kableExtra::kable(varImp(model_xgbTree)$importance %>% 
+                    arrange(-Overall) %>%
+                    slice_head(n = 10),
+                  align = "c", 
+                  format = "latex") %>% 
+  kableExtra::kable_styling(position = "center", latex_options=c("scale_down", "HOLD_position"))
+```
+
+### Logit
+
+Las 10 partidas de egresos que más influencia tienen en la corrupción de acuerdo a la Regresión Logística:
+
+```{r var_imp_logit, echo=FALSE}
+kableExtra::kable(as.data.frame(varImp(model_Logit)) %>% 
+                           arrange(-Overall) %>%
+                           slice_head(n = 10), 
+                         align = "c", 
+                         format = "latex") %>% 
+  kableExtra::kable_styling(position = "center", latex_options=c("scale_down", "HOLD_position"))
+```
+
+## Notas de interpretación
+
+### Overall Accuracy
+
+Es la media de las predicciones correctas que obtiene el algoritmo. Se calcula como el número de aciertos entre el número de observaciones:
+
+$$
+\begin{aligned}
+Overall Accuracy = \frac{(\hat{Y} = 1,\ \text{cuando } Y = 1) + (\hat{Y} = 0\ ,\  \text{cuando } Y = 0)}{N}
+\end{aligned}
+$$
+
+### Raíz del Error Cuadrado Medio (RMSE)
+
+Es la desviación media de los valores predichos. Entre más cercano a 0 mejor. 
+
+$$
+\begin{aligned}
+RMSE = \sqrt{ \frac{1}{N} \sum^N_{i=1} (\hat{Y}-Y)^2}
+\end{aligned}
+$$
+
+### F1-score
+
+Es la media armónica de las métricas precision (proporción de valores predichos positivos que son reales positivos) y recall (proporción de valores reales positivos que son predecidos como positivos). Entre mayor sea su valor mejor.
+
+$$
+\begin{aligned}
+F_1\text{-}score = 2 \times  \frac{\text{precision} \cdot \text{recall}}{\text{precision + recall}}
+\end{aligned}
+$$
+
+
+
+
