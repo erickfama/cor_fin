@@ -35,7 +35,7 @@ encig19_inc_clean <- encig19_clean %>%
   group_by(mun_inegi, nom_ent, nom_mun) %>%
   summarise(frec_inc_corrup = sum(inc_corrup_fac),
             frec_no_corrup = sum(no_corrup_fac),
-            prop_inc_corrup = (frec_inc_corrup/frec_no_corrup)*100)
+            prop_corrup = (frec_inc_corrup/frec_no_corrup)*100)
 
 # Escritura ----
 

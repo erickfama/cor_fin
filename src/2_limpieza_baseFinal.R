@@ -110,8 +110,8 @@ efipemCor19_inc_raw <- efipem19_clean %>%
 
 ## Limpieza incidencia ----
 efipemCor19_inc_clean <- efipemCor19_inc_raw %>%
-  filter(!is.na(prop_inc_corrup)) %>%
-  select(mun_inegi, nom_ent, nom_mun, prop_inc_corrup, tema, categoria, descripcion_categoria, valor, pobtot, pea, graproes) %>%
+  filter(!is.na(prop_corrup)) %>%
+  select(mun_inegi, nom_ent, nom_mun, prop_corrup, tema, categoria, descripcion_categoria, valor, pobtot, pea, graproes) %>%
   mutate(across(c("tema", "categoria", "descripcion_categoria"), ~ stri_trans_general(str_replace_all(str_replace_all(str_to_lower(.x), "\\s", "_"), ",", ""), id = "Latin-ASCII")),
          valor = valor/pea) # Gasto per capita PEA
   
