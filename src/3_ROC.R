@@ -54,11 +54,13 @@ roc_ig %>%
   ggplot(aes(FPR, TPR, color = method)) +
   geom_point() +
   geom_line() +
-  ggrepel::geom_text_repel(aes(label = round(prop, 2))) +
+  ggrepel::geom_text_repel(aes(label = round(prop, 2)), show.legend = FALSE) +
   scale_x_continuous(limits = c(0, 1), breaks = scales::pretty_breaks(n = 10)) +
   scale_y_continuous(limits = c(0, 1), breaks = scales::pretty_breaks(n = 10)) +
   scale_color_discrete(name = "Modelo") +
   theme_bw() +
   labs(title = "Curvas ROC",
        subtitle = "Ingresos",
+       x = "FPR (False Positive Rate)",
+       y = "TPR (True Positive Rate - Sensibilidad)",
        caption = "Elaboración propia.")
