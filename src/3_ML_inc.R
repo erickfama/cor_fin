@@ -6,15 +6,16 @@ library(caret)
 library(xgboost)
 
 # Lectura ----
-egresos <- read_csv("./data/3_final/egresos19_inc_clean.csv")
+# egresos <- read_csv("./data/3_final/egresos19_inc_clean.csv")
+egresos <- fst::read_fst("./data/3_final/egresos19_inc_clean.fst")
 
 # ROC ----
-props <- seq(0, mean(egresos$prop_inc_corrup), length.out = 10)
+props <- seq(0, mean(egresos$prop_corrup), length.out = 10)
 
 roc_inc <- map_df(props, function(p){
     # Dummy Corrupcion ----
     df <- egresos %>%
-    mutate(corrup = ifelse(prop_inc_corrup > p, 1, 0),
+    mutate(corrup = ifelse(prop_corrup > p, 1, 0),
            corrup = factor(corrup, levels = c(1, 0), labels = c("corrupto", "no_corrupto"))) %>%
       select(pobtot, graproes, starts_with("partida"), corrup)
   
@@ -50,9 +51,9 @@ best_cutoff_inc <- roc_inc$prop[which(roc_inc$recall == max(roc_inc$recall[which
 
 # Dummy Corrupcion ----
 df <- egresos %>%
-  mutate(corrup = ifelse(prop_inc_corrup > best_cutoff_inc, 1, 0),
+  mutate(corrup = ifelse(prop_corrup > best_cutoff_inc, 1, 0),
          corrup = factor(corrup, levels = c(1, 0), labels = c("corrupto", "no_corrupto"))) %>%
-  select(pobtot, graproes, starts_with("partida"), corrup)
+  select(everything(), corrup, -c(mun_inegi, tema, nom_ent, nom_mun, frec_inc_corrup, frec_no_corrup, prop_corrup))
 
 # Train y test sets ----
 set.seed(123)
@@ -86,7 +87,7 @@ rmse_xgbTree <- sqrt(sum((y_hat_xgbTree_bin - y)^2)/nrow(test_set))
 F1_xgbTree_inc <- F_meas(y_hat_xgbTree_inc, reference = test_set$corrup)
 
 # Variable importance xgbTree
-varImp(model_xgbTree)
+varImp(model_xgbTree_inc)
 
 # Confusion matrix
 table(predicted = y_hat_xgbTree_inc, actual = test_set$corrup)
