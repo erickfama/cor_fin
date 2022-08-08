@@ -52,8 +52,9 @@ id_act <- readxl::read_xlsx("./data/1_raw/scian_2018_categorias_y_productos.xlsx
   mutate(codigo = as.character(codigo))
 
 # Escritura ----
-write.csv(censo_econ_estados, "./data/1_raw/censo_econ2019_raw.csv", row.names = FALSE)
+# write_csv(censo_econ_estados, "./data/1_raw/censo_econ2019_raw.csv")
 fst::write.fst(censo_econ_estados, "./data/1_raw/censo_econ2019_raw.fst")
+rm(censo_estados, censo_econ_estados)
 
 # Lectura ----
 censo_econ2019_raw <- fst::read_fst("./data/1_raw/censo_econ2019_raw.fst")

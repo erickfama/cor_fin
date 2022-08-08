@@ -2,7 +2,6 @@
 
 # Librerias ----
 library(tidyverse)
-library(survey)
 
 # Lectura ----
 encig19_raw <- read_csv("./data/1_raw/encig19_raw.csv")
@@ -23,11 +22,11 @@ encig19_clean <- encig19_raw %>%
 ## Percepcion corrupcion ----
 
 ## Nivel municipio
-encig19_mun_clean <- encig19_clean %>%
+encig19_per_clean <- encig19_clean %>%
   group_by(mun_inegi, nom_ent, nom_mun) %>%
   summarise(frec_corrup = sum(corrup_fac),
             frec_no_corrup = sum(no_corrup_fac),
-            prop_corrup = (frec_corrup/frec_no_corrup)*100)
+            prop_corrup = ((frec_corrup/(frec_corrup + frec_no_corrup))*100))
 
 ## Incidencia corrupcion ----
 
@@ -35,13 +34,13 @@ encig19_inc_clean <- encig19_clean %>%
   group_by(mun_inegi, nom_ent, nom_mun) %>%
   summarise(frec_inc_corrup = sum(inc_corrup_fac),
             frec_no_corrup = sum(no_corrup_fac),
-            prop_corrup = (frec_inc_corrup/frec_no_corrup)*100)
+            prop_corrup = (frec_inc_corrup/(frec_inc_corrup + frec_no_corrup))*100)
 
 # Escritura ----
 
 # Base 
 write_csv(encig19_clean, "./data/2_interim/encig19_clean.csv")
 # Percepcion
-write_csv(encig19_mun_clean, "./data/2_interim/encig19_mun_clean.csv")
+write_csv(encig19_per_clean, "./data/2_interim/encig19_per_clean.csv")
 # Incidencia 
 write_csv(encig19_inc_clean, "./data/2_interim/encig19_inc_clean.csv")
