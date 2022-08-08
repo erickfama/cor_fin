@@ -1,13 +1,14 @@
 ### Optimization ###
 
 # Librerias ----
+library(fst)
 source("./src/3_Optim_function.R")
 
 # Egresos ----
 
 ## Lectura ----
-egresos_per <- read_csv("./data/3_final/egresos19_per_clean.csv")
-egresos_inc <- read_csv("./data/3_final/egresos19_inc_clean.csv")
+egresos_per <- read_fst("./data/3_final/egresos19_per_clean.fst")
+egresos_inc <- read_fst("./data/3_final/egresos19_inc_clean.fst")
 
 ## Metricas ----
 eval_eg_per <- Optim(egresos_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
@@ -15,7 +16,7 @@ eval_eg_inc <- Optim(egresos_inc, method_name = "Incidencia", props_values = seq
 eval_eg <- rbind(eval_eg_per, eval_eg_inc)
 
 ## Escritura ----
-write.csv(eval_eg, "./data/2_interim/eval_eg.csv", row.names = FALSE)
+write_csv(eval_eg, "./data/2_interim/eval_eg.csv")
 
 ## F1 score optim ----
 eval_eg <- read_csv("./data/2_interim/eval_eg.csv", locale = locale(encoding = "latin1"))
@@ -36,8 +37,8 @@ eval_eg %>%
 # Ingresos ----
 
 ## Lectura ----
-ingresos_per <- read_csv("./data/3_final/ingresos19_per_clean.csv")
-ingresos_inc <- read_csv("./data/3_final/ingresos19_inc_clean.csv")
+ingresos_per <- read_fst("./data/3_final/ingresos19_per_clean.fst")
+ingresos_inc <- read_fst("./data/3_final/ingresos19_inc_clean.fst")
 
 ## Metricas ----
 eval_ig_per <- Optim(ingresos_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
