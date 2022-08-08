@@ -24,7 +24,7 @@ ROC <- function(data, method_name, props_values, seed = TRUE){
     df <- data %>%
       mutate(across(starts_with("prop"), ~ ifelse(.x > p, 1, 0), .names = "corrup"),
              corrup = factor(corrup, levels = c(1, 0), labels = c("corrupto", "no_corrupto"))) %>%
-      select(pobtot, graproes, starts_with("partida"), corrup)
+      select(everything(), corrup, -c(mun_inegi, tema, nom_ent, nom_mun, frec_corrup, frec_no_corrup, prop_corrup))
     
     # Train y test sets ----
     if(seed == TRUE){
