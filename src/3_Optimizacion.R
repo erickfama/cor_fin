@@ -7,12 +7,12 @@ source("./src/3_Optim_function.R")
 # Egresos ----
 
 ## Lectura ----
-egresos_per <- read_fst("./data/3_final/egresos19_per_clean.fst")
-egresos_inc <- read_fst("./data/3_final/egresos19_inc_clean.fst")
+eg_per <- read_fst("./data/3_final/egresos19_per_clean.fst")
+eg_inc <- read_fst("./data/3_final/egresos19_inc_clean.fst")
 
 ## Metricas ----
-eval_eg_per <- Optim(egresos_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
-eval_eg_inc <- Optim(egresos_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
+eval_eg_per <- Optim(eg_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
+eval_eg_inc <- Optim(eg_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
 eval_eg <- rbind(eval_eg_per, eval_eg_inc)
 
 ## Escritura ----
@@ -41,8 +41,8 @@ ingresos_per <- read_fst("./data/3_final/ingresos19_per_clean.fst")
 ingresos_inc <- read_fst("./data/3_final/ingresos19_inc_clean.fst")
 
 ## Metricas ----
-eval_ig_per <- Optim(ingresos_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
-eval_ig_inc <- Optim(ingresos_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
+eval_ig_per <- Optim(ig_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
+eval_ig_inc <- Optim(ig_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
 eval_ig <- rbind(eval_ig_per, eval_ig_inc)
 
 ## Escritura ----
