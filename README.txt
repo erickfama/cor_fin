@@ -64,7 +64,7 @@ IMPORTANTE: Las métricas de evaluación (precisión, recall, etc.) fueron evalu
 CAMBIOS: 
 	- Se actualizó la seleccion de variables para incluir las variables del censo economico
 
-# 3_Optimizacion
+# 3_Optimizacion ----
 Aplica la función a los conjuntos de ingresos y egresos para optimizar el valor de la proporción de corrupción.
 Se grafican los resultados de la optimización.
 Se guardan los conjuntos de datos "./data/2_interim/eval_eg.csv" y "./data/2_interim/eval_ig.csv" con los resultados de la optimización.
@@ -72,12 +72,34 @@ Se guardan los conjuntos de datos "./data/2_interim/eval_eg.csv" y "./data/2_int
 CAMBIOS: 
 	- Se actualizacon los paths y funciones para archivos .fst
 
-# 3_ROC_function
+# 3_ROC_function ----
 Básicamente igual a la función de optimización, pero en este caso las métricas de evaluación se realizaron con el test set.
 
 CAMBIOS: 
 	- Se actualizó la seleccion de variables para incluir las variables del censo economico
 
-# 3_ROC 
+# 3_ROC ----
 Se aplica la función ROC para crear gráficos comparativos entre los modelos de percepción e incidencia.
 Se guardan los conjuntos de datos "./data/2_interim/roc_eg.csv" y "./data/2_interim/roc_ig.csv" con los resultados de la función ROC.
+
+# 3_ML_function ----
+Sirve para aplicar el algoritmo Gradient Boostinga a través de la función gb_model()
+El cutoff es elegido con los resultados del script 3_Optimizacion.
+Se crea la función best_cutoff() para extraer el valor del conjunto de datos de evaluación
+
+CAMBIOS:
+	- Se actualizó la selección de variables para incluir las variables del censo económico
+
+# 3_ML_modeling
+Aplica la función gb_model() utilizando el mejor cutoff de la etapa de optimización
+Se entrenan cuatro modelos: Dos de ingresos y dos de egresos; percepción e incidencia.
+
+CAMBIOS:
+	- Reemplazo read_csv por read_fst
+
+# 4_deployment ----
+Se utilizan los modelos del script 3_ML para predecir los valores de corrupción de cada municipio.
+Se guardan los resultados, es decir, los valores predichos por los modelos en "./data/3_final/" con la terminación "predicted"
+
+
+
