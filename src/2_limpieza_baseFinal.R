@@ -52,7 +52,7 @@ for(muni in mun_NA){
     efipemCor19_per_clean[index, var] <- mean_mun[index_mean, var]
   }
 }
-efipemCor19_clean <- efipemCor19_per_clean %>%
+efipemCor19_per_clean <- efipemCor19_per_clean %>%
   select(-estado)
 
 ## Escritura base completa percepcion ----
@@ -130,8 +130,9 @@ for(muni in mun_NA){
     efipemCor19_inc_clean[index, var] <- mean_mun[index_mean, var]
   }
 }
-efipemCor19_clean <- efipemCor19_inc_clean %>%
-  select(-estado)
+efipemCor19_inc_clean <- efipemCor19_inc_clean %>%
+  select(-estado) %>%
+  rename(frec_corrup = frec_inc_corrup)
 
 ## Escritura base completa incidencia ----
 fst::write_fst(efipemCor19_inc_raw, "./data/2_interim/efipemCor19_inc_raw.fst")
