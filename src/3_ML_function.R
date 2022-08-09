@@ -17,12 +17,12 @@ gb_model <- function(data, cutoff = 0, seed = TRUE){
   df <- read_csv(data) %>%
     mutate(across(starts_with("prop"), ~ ifelse(.x > cutoff, 1, 0), .names = "corrup"), # RESOLVER PROBLEMA DE STARTS WITH
            corrup = factor(corrup, levels = c(1, 0), labels = c("corrupto", "no_corrupto"))) %>%
-    select(pobtot, graproes, starts_with("partida"), corrup)
+    select(everything(), corrup, -c(mun_inegi, tema, nom_ent, nom_mun, frec_corrup, frec_no_corrup, prop_corrup, starts_with("concepto"), starts_with("capitulo"), starts_with("tema")))
   } else {
     df <- data %>%
       mutate(across(starts_with("prop"), ~ ifelse(.x > cutoff, 1, 0), .names = "corrup"),
              corrup = factor(corrup, levels = c(1, 0), labels = c("corrupto", "no_corrupto"))) %>%
-      select(pobtot, graproes, starts_with("partida"), corrup)
+      select(everything(), corrup, -c(mun_inegi, tema, nom_ent, nom_mun, frec_corrup, frec_no_corrup, prop_corrup, starts_with("concepto"), starts_with("capitulo"), starts_with("tema")))
   }
   
   # Train y test sets 
@@ -54,7 +54,31 @@ gb_model <- function(data, cutoff = 0, seed = TRUE){
   beepr::beep(sound = 2)
   
   results <- list(var_imp = var_imp,
-       cm = cm)
+       cm = cm,
+       model = model)
   return(results)
+}
+
+# Best cutoff
+best_cutoff <- function(tipo_fin, method){
+  if(tipo_fin == "eg"){
+    cutoff <- read_csv("./data/2_interim/eval_eg.csv", locale = locale(encoding = "UTF-8"), show_col_types = FALSE) %>%
+      select(method, best_cutoff) 
+    if(method == "per"){
+      value <- cutoff %>% filter(method == "Percepción") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    } else {
+      value <- cutoff %>% filter(method == "Incidencia") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    }
+  } 
+  if(tipo_fin == "ig"){
+    cutoff <- read_csv("./data/2_interim/eval_ig.csv", locale = locale(encoding = "latin1"), show_col_types = FALSE) %>%
+      select(method, best_cutoff) 
+    if(method == "per"){
+      value <- cutoff %>% filter(method == "Percepción") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    } else {
+      value <- cutoff %>% filter(method == "Incidencia") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    }
+  }
+  value <- ifelse(is.null(value), 0, value)
 }
 
