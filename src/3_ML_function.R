@@ -80,5 +80,6 @@ best_cutoff <- function(tipo_fin, method){
     }
   }
   value <- ifelse(is.null(value), 0, value)
+  return(value)
 }
 
