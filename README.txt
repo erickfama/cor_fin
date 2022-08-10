@@ -101,5 +101,7 @@ CAMBIOS:
 Se utilizan los modelos del script 3_ML para predecir los valores de corrupción de cada municipio.
 Se guardan los resultados, es decir, los valores predichos por los modelos en "./data/3_final/" con la terminación "predicted"
 
+NOTA: UTILIZAR CONJUNTOS DE DATOS DE **TODOS** LOS MUNICIPIOS PARA PREDECIR CON EL MODELO
+
 
 
