@@ -5,7 +5,7 @@ library(tidyverse)
 library(fst)
 library(caret)
 library(xgboost)
-source("./src/3_ML_function.R")
+source("./src/3_ML_function.R", encoding = "UTF-8")
 
 # Lectura ----
 eg_per <- read_fst("./data/3_final/egresos19_per_clean.fst")

@@ -4,6 +4,7 @@
 library(tidyverse)
 library(fst)
 library(caret)
+source("./src/3_ML_modeling.R", encoding = "UTF-8")
 
 # Lectura ----
 eg_per <- read_fst("./data/3_final/egresos19_per_clean.fst")
@@ -33,6 +34,7 @@ best_cutoff <- function(tipo_fin, method){
     }
   }
   value <- ifelse(is.null(value), 0, value)
+  return(value)
 }
 # Egresos ----
 
