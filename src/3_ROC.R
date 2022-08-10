@@ -8,12 +8,12 @@ source("./src/3_ROC_function.R")
 # Egresos ----
 
 ## Lectura ----
-egresos_per <- read_fst("./data/3_final/egresos19_per_clean.fst")
-egresos_inc <- read_fst("./data/3_final/egresos19_inc_clean.fst")
+eg_per <- read_fst("./data/3_final/egresos19_per_clean.fst")
+eg_inc <- read_fst("./data/3_final/egresos19_inc_clean.fst")
 
 ## ROC ----
-roc_eg_per <- ROC(egresos_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
-roc_eg_inc <- ROC(egresos_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
+roc_eg_per <- ROC(eg_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
+roc_eg_inc <- ROC(eg_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
 roc_eg <- rbind(roc_eg_per, roc_eg_inc)
 
 ## Escritura ----
@@ -38,12 +38,12 @@ roc_eg %>%
 # Ingresos ----
 
 ## Lectura ----
-ingresos_per <- read_fst("./data/3_final/ingresos19_per_clean.fst")
-ingresos_inc <- read_fst("./data/3_final/ingresos19_inc_clean.fst")
+ig_per <- read_fst("./data/3_final/ingresos19_per_clean.fst")
+ig_inc <- read_fst("./data/3_final/ingresos19_inc_clean.fst")
 
 ## ROC ----
-roc_ig_per <- ROC(ingresos_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
-roc_ig_inc <- ROC(ingresos_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
+roc_ig_per <- ROC(ig_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
+roc_ig_inc <- ROC(ig_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
 roc_ig <- rbind(roc_ig_per, roc_ig_inc)
 
 ## Escritura ----
