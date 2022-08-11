@@ -50,6 +50,7 @@ CAMBIOS:
 	- Se elimina el apartado de la base completa
 	- Se modifica la ruta del conjunto de percepción
 	- Se agregan las variables económicas al conjunto de percepción
+	- Se crearon conjuntos de datos que contienen observaciones de todos los municipios para predecir clasificarlos a todos como corruptos o no corruptos con ayuda de los modelos entrenados
 
 ### Modelación ###
 
@@ -98,10 +99,11 @@ CAMBIOS:
 	- Reemplazo read_csv por read_fst
 
 # 4_deployment ----
-Se utilizan los modelos del script 3_ML para predecir los valores de corrupción de cada municipio.
+Se utilizan los modelos del script 3_ML para predecir los valores de corrupción de cada municipio, utilizando los conjuntos de datos que contienen observaciones de todos los municipios
 Se guardan los resultados, es decir, los valores predichos por los modelos en "./data/3_final/" con la terminación "predicted"
 
-NOTA: UTILIZAR CONJUNTOS DE DATOS DE **TODOS** LOS MUNICIPIOS PARA PREDECIR CON EL MODELO
+# 5_geo ----
+Se utilizan las clasificaciones predichas por los modelos para graficar mapas. Output final
 
 
 
