@@ -4,14 +4,19 @@
 library(tidyverse)
 library(fst)
 library(caret)
-source("./src/3_ML_modeling.R", encoding = "UTF-8")
 
 # Lectura ----
-eg_per <- read_fst("./data/3_final/egresos19_per_clean.fst")
-eg_inc <- read_fst("./data/3_final/egresos19_inc_clean.fst")
+eg_per <- read_fst("./data/3_final/eg_per_all_clean.fst") 
+eg_inc <- read_fst("./data/3_final/eg_inc_all_clean.fst")
 
-ig_per <- read_fst("./data/3_final/ingresos19_per_clean.fst")
-ig_inc <- read_fst("./data/3_final/ingresos19_inc_clean.fst")
+ig_per <- read_fst("./data/3_final/ig_per_all_clean.fst")
+ig_inc <- read_fst("./data/3_final/ig_inc_all_clean.fst")
+
+## Modelos 
+model_eg_per <- readRDS("./models/model_eg_per.rds")
+model_eg_inc <- readRDS("./models/model_eg_inc.rds")
+model_ig_per <- readRDS("./models/model_ig_per.rds")
+model_ig_inc <- readRDS("./models/model_ig_inc.rds")
 
 # cutoff 
 best_cutoff <- function(tipo_fin, method){
