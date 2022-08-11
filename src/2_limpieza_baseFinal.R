@@ -28,7 +28,7 @@ efipemCor19_per_raw <- efipem19_clean %>%
 
 ## Limpieza percepcion ----
 efipemCor19_per_clean <- efipemCor19_per_raw %>%
-  filter(!is.na(prop_corrup)) %>%
+  # filter(!is.na(prop_corrup)) %>%
   mutate(estado = substr(mun_inegi, 1, 2)) %>%
   select(mun_inegi, estado, everything()) %>%
   mutate(across(c("tema", "categoria", "descripcion_categoria"), ~ stri_trans_general(str_replace_all(str_replace_all(str_to_lower(.x), "\\s", "_"), ",", ""), id = "Latin-ASCII")),
@@ -52,28 +52,35 @@ for(muni in mun_NA){
     efipemCor19_per_clean[index, var] <- mean_mun[index_mean, var]
   }
 }
-efipemCor19_per_clean <- efipemCor19_per_clean %>%
-  select(-estado)
+
+eg_per_all_clean <- efipemCor19_per_clean %>%
+  select(-estado) %>%
+  filter(tema == "egresos") %>%
+  unite(col = "cat_desc", categoria, descripcion_categoria, sep = "_") %>%
+  pivot_wider(names_from = cat_desc, values_from = valor, values_fn = list(valor = sum), values_fill = 0) %>%
+  select(-pea)
+
+ig_per_all_clean <- efipemCor19_per_clean %>%
+  select(-estado) %>%
+  filter(tema == "ingresos") %>%
+  unite(col = "cat_desc", categoria, descripcion_categoria, sep = "_") %>%
+  pivot_wider(names_from = cat_desc, values_from = valor, values_fn = list(valor = sum), values_fill = 0) %>%
+  select(-pea)
 
 ## Escritura base completa percepcion ----
 # write.csv(efipemCor19_per_raw, "./data/2_interim/efipemCor19_per_raw.csv", row.names = FALSE)
 # write.csv(efipemCor19_per_clean, "./data/2_interim/efipemCor19_per_clean.csv", row.names = FALSE)
-fst::write_fst(efipemCor19_per_raw, "./data/2_interim/efipemCor19_per_raw.fst")
 fst::write_fst(efipemCor19_per_clean, "./data/2_interim/efipemCor19_per_clean.fst")
+fst::write_fst(eg_per_all_clean, "./data/3_final/eg_per_all_clean.fst")
+fst::write_fst(ig_per_all_clean, "./data/3_final/ig_per_all_clean.fst")
 
-## Base Egresos ----
-egresos19_per_clean <- efipemCor19_per_clean %>%
-  filter(tema == "egresos") %>% 
-  unite(col = "cat_desc", categoria, descripcion_categoria, sep = "_") %>%
-  pivot_wider(names_from = cat_desc, values_from = valor, values_fn = list(valor = sum), values_fill = 0) %>%
-  select(-pea)
+## Base Egresos modelar ----
+egresos19_per_clean <- eg_per_all_clean %>%
+  filter(!is.na(prop_corrup))
 
-## Base Ingresos ----
-ingresos19_per_clean <- efipemCor19_per_clean %>%
-  filter(tema == "ingresos") %>% 
-  unite(col = "cat_desc", categoria, descripcion_categoria, sep = "_") %>%
-  pivot_wider(names_from = cat_desc, values_from = valor, values_fn = list(valor = sum), values_fill = 0) %>%
-  select(-pea)
+## Base Ingresos modelar ----
+ingresos19_per_clean <- ig_per_all_clean %>%
+  filter(!is.na(prop_corrup)) 
 
 ## Escritura ingresos/egresos ----
 # write_csv(egresos19_per_clean, "./data/3_final/egresos19_per_clean.csv")
@@ -106,7 +113,6 @@ efipemCor19_inc_raw <- efipem19_clean %>%
 
 ## Limpieza incidencia ----
 efipemCor19_inc_clean <- efipemCor19_inc_raw %>%
-  filter(!is.na(prop_corrup)) %>%
   mutate(estado = substr(mun_inegi, 1, 2)) %>%
   select(mun_inegi, estado, everything()) %>%
   mutate(across(c("tema", "categoria", "descripcion_categoria"), ~ stri_trans_general(str_replace_all(str_replace_all(str_to_lower(.x), "\\s", "_"), ",", ""), id = "Latin-ASCII")),
@@ -134,23 +140,31 @@ efipemCor19_inc_clean <- efipemCor19_inc_clean %>%
   select(-estado) %>%
   rename(frec_corrup = frec_inc_corrup)
 
+eg_inc_all_clean <- efipemCor19_inc_clean %>%
+  filter(tema == "egresos") %>%
+  unite(col = "cat_desc", categoria, descripcion_categoria, sep = "_") %>%
+  pivot_wider(names_from = cat_desc, values_from = valor, values_fn = list(valor = sum), values_fill = 0) %>%
+  select(-pea)
+
+ig_inc_all_clean <- efipemCor19_inc_clean %>%
+  filter(tema == "ingresos") %>%
+  unite(col = "cat_desc", categoria, descripcion_categoria, sep = "_") %>%
+  pivot_wider(names_from = cat_desc, values_from = valor, values_fn = list(valor = sum), values_fill = 0) %>%
+  select(-pea)
+
+
 ## Escritura base completa incidencia ----
-fst::write_fst(efipemCor19_inc_raw, "./data/2_interim/efipemCor19_inc_raw.fst")
 fst::write_fst(efipemCor19_inc_clean, "./data/2_interim/efipemCor19_inc_clean.fst")
+fst::write_fst(eg_inc_all_clean, "./data/3_final/eg_inc_all_clean.fst")
+fst::write_fst(ig_inc_all_clean, "./data/3_final/ig_inc_all_clean.fst")
 
 ## Base Egresos ----
 egresos19_inc_clean <- efipemCor19_inc_clean %>%
-  filter(tema == "egresos") %>% 
-  unite(col = "cat_desc", categoria, descripcion_categoria, sep = "_") %>%
-  pivot_wider(names_from = cat_desc, values_from = valor, values_fn = list(valor = sum), values_fill = 0) %>%
-  select(-pea)
+  filter(!is.na(prop_corrup))
 
 ## Base Ingresos ----
 ingresos19_inc_clean <- efipemCor19_inc_clean %>%
-  filter(tema == "ingresos") %>% 
-  unite(col = "cat_desc", categoria, descripcion_categoria, sep = "_") %>%
-  pivot_wider(names_from = cat_desc, values_from = valor, values_fn = list(valor = sum), values_fill = 0) %>%
-  select(-pea)
+  filter(is.na(prop_corrup))
 
 ## Escritura ingresos/egresos ----
 fst::write_fst(egresos19_inc_clean, "./data/3_final/egresos19_inc_clean.fst")
