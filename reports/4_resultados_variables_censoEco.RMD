@@ -1,0 +1,114 @@
+---
+title: "Reporte de resultados 4"
+subtitle: "Incorporación de variables del censo económico"
+author:
+- "Asistente de investigación: Erick Gabriel Fajardo Martínez"
+- "Investigador: Dr. Gabriel Purón Cid"
+date: '`r Sys.Date()`'
+fontsize: 12pt
+output:   
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+ \usepackage{float}
+---
+
+```{r setup, include=FALSE}
+set.seed(123)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.pos="H")
+```
+
+```{r librerias, echo=FALSE}
+# Librerias ----
+library(tidyverse)
+library(ggtext)
+library(here)
+library(kableExtra)
+```
+
+```{r lectura, echo=FALSE}
+## Egresos ----
+eg_per_predicted <- read_csv(here("./data/3_final/eg_per_predicted.csv")) %>%
+  rename(corrup_hat_eg_per = corrup_hat, corrup_eg_per = corrup)
+eg_inc_predicted <- read_csv(here("./data/3_final/eg_inc_predicted.csv")) %>%
+  rename(corrup_hat_eg_inc = corrup_hat, corrup_eg_inc = corrup)
+
+## Ingresos ----
+ig_per_predicted <- read_csv(here("./data/3_final/ig_per_predicted.csv")) %>%
+  rename(corrup_hat_ig_per = corrup_hat, corrup_ig_per = corrup)
+ig_inc_predicted <- read_csv(here("./data/3_final/ig_inc_predicted.csv")) %>%
+  rename(corrup_hat_ig_inc = corrup_hat, corrup_ig_inc = corrup)
+
+## Modelos ----
+model_eg_per <- readRDS(here("./models/model_eg_per.rds"))
+model_eg_inc <- readRDS(here("./models/model_eg_inc.rds"))
+model_ig_per <- readRDS(here("./models/model_ig_per.rds"))
+model_ig_inc <- readRDS(here("./models/model_ig_inc.rds"))
+
+## Mapa ----
+mun_mapa <- sf::read_sf(here("./data/maps/muni.shp"))
+
+# cutoff 
+best_cutoff <- function(tipo_fin, method){
+  if(tipo_fin == "eg"){
+    cutoff <- read_csv("./data/2_interim/eval_eg.csv", locale = locale(encoding = "UTF-8"), show_col_types = FALSE) %>%
+      select(method, best_cutoff) 
+    if(method == "per"){
+      value <- cutoff %>% filter(method == "Percepción") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    } else {
+      value <- cutoff %>% filter(method == "Incidencia") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    }
+  } 
+  if(tipo_fin == "ig"){
+    cutoff <- read_csv("./data/2_interim/eval_ig.csv", locale = locale(encoding = "latin1"), show_col_types = FALSE) %>%
+      select(method, best_cutoff) 
+    if(method == "per"){
+      value <- cutoff %>% filter(method == "Percepción") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    } else {
+      value <- cutoff %>% filter(method == "Incidencia") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    }
+  }
+  value <- ifelse(is.null(value), 0, value)
+  return(value)
+}
+```
+
+# Avances
+
+Recapitulando, en los reportes anteriores se habían desarrollado y entrenado modelos de aprendizaje máquina utilizando el algoritmo de *Gradient Boosting*, donde la variable de interés es la clasificación de cada municipio (corrupto y no corrupto) y las variables explicativas son los datos sobre las finanzas públicas de cada municipio. Todos los datos sobre las finanzas públicas fueron estandarizados por la población total del municipio. Recordemos que fueron entrenados 4 modelos, los cuales pueden ser clasificados en dos grandes categorías: egresos e ingresos, es decir, modelos entrenados con los respectivos datos de las finanzas públicas; y en subcategorías que corresponden a la construcción de la variable de interés, ya que la clasificación de corrupción fue realizada con la pregunta de percepción y la pregunta de incidencia de la ENCIG 2019. La clasificación de los modelos es resumida de la siguiente manera:
+
+\begin{minipage}[t]{0.5\textwidth}
+\textbf{Modelo de egresos}\\
+\begin{itemize}
+    \item Utilizando la variable de interés con base en la percepción\\
+    \item Utilizando la variable de interés con base en la incidencia\\
+\end{itemize}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\textbf{Modelo de ingresos}\\
+\begin{itemize}
+    \item Utilizando la variable de interés con base en la percepción\\
+    \item Utilizando la variable de interés con base en la incidencia\\
+\end{itemize}
+\end{minipage}
+
+# Descripción de los datos del Censo Económico
+
+La novedad de estos nuevos modelos es que incorporan los datos del censo económico 2019, lo cual proporciona una mayor robustes en cuanto a las características que definen los outputs de cada modelo. Las variables elegidas de este conjunto de datos fueron las siguientes:
+
+
+```{r variables_censo, echo=FALSE}
+variables_censo <- read_csv(here("./reports/variables_censo.csv"))
+kable(variables_censo, 
+                 align = "c", 
+                 format = "latex",
+                 caption = "") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+Cada una de estas variables fue repetida por cada sector económico de acuerdo a la clasificación del Sistema de Clasificación Industrial de América del Norte 2018 (SCIAN 2018), el cual contiene 20 grandes sectores. El número de total de variables construídas con los datos del censo económico resultó en 187. Sumado a las variables de las finanzas públicas, los conjuntos de datos de egresos cuentan con más de 500 variables explicativas y los conjuntos de ingresos con más de 300 variables explicativas.
+
+# Desempeño de los modelos entrenados
+
+
+
