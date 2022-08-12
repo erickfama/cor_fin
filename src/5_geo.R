@@ -2,7 +2,10 @@
 
 # Librerias ----
 library(tidyverse)
-library(RColorBrewer)
+library(ggtext)
+# library(hcandersenr)
+# library(tidytext)
+# library(RColorBrewer)
 
 # Lectura ----
 
@@ -17,6 +20,12 @@ ig_per_predicted <- read_csv("./data/3_final/ig_per_predicted.csv") %>%
   rename(corrup_hat_ig_per = corrup_hat, corrup_ig_per = corrup)
 ig_inc_predicted <- read_csv("./data/3_final/ig_inc_predicted.csv") %>%
   rename(corrup_hat_ig_inc = corrup_hat, corrup_ig_inc = corrup)
+
+## Modelos ----
+model_eg_per <- readRDS("./models/model_eg_per.rds")
+model_eg_inc <- readRDS("./models/model_eg_inc.rds")
+model_ig_per <- readRDS("./models/model_ig_per.rds")
+model_ig_inc <- readRDS("./models/model_ig_inc.rds")
 
 ## Mapa ----
 mun_mapa <- sf::read_sf("./data/maps/muni.shp")
@@ -56,8 +65,6 @@ mun_mapa <- mun_mapa %>%
   mutate(across(starts_with("corrup"), ~ ifelse(.x == "corrupto", 1, 0)),
          across(starts_with("corrup"), ~ factor(.x, levels = c(1, 0), labels = c("corrupto", "no_corrupto"))))
 
-# Lectura del mapa
-mun_mapa <- sf::read_sf("./data/maps/muni.shp")
 
 # Graficos ----
 
@@ -69,26 +76,28 @@ mun_mapa <- sf::read_sf("./data/maps/muni.shp")
 mun_mapa %>%
   ggplot(aes(fill = corrup_eg_per)) +
   geom_sf() +
-  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FFA600", "#00BFC4")) +
-  theme_bw() +
-  labs(title = bquote("Clasificación"~bold("real")~"de corrupción de los municipios"),
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#ff6d00", "#0092ff")) +
+  labs(title = "Clasificación<b>real</b> de corrupción de los municipios con base en sus <span style='color:#008dff;'>egresos</span>",
        subtitle = glue::glue("Total de municipios encuestados en la ENCIG: {sum(!is.na(eg_per_predicted$corrup_eg_per))}\n
                              Cutoff de proporción: {best_cutoff('eg', 'per')}"),
-       caption = "Elaboración propia con datos de la ENCIG 2019.")
-
+       caption = "Elaboración propia con datos de la ENCIG 2019.") +
+  theme_bw() +
+  theme(plot.title = element_markdown())
 
 #### Predichas ----
 mun_mapa %>%
   ggplot(aes(fill = factor(corrup_hat_eg_per, levels = c("corrupto", "no_corrupto")))) +
   geom_sf() +
-  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FFA600", "#00BFC4")) +
-  theme_bw() +
-  labs(title = bquote("Clasificación"~bold("predicha")~"de corrupción de los municipios"),
-       subtitle = glue::glue("Modelo de percepción\n
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#ff6d00", "#0092ff")) +
+  labs(title = "Clasificación<b>predicha</b> de corrupción de los municipios con base en sus <span style='color:#008dff;'>egresos</span>",
+       subtitle = glue::glue("<br>Modelo de <b><span style='color:#0092ff;'>percepción</span></b></br>\n
                              Total de municipios modelados: {nrow(eg_per_predicted)}\n
                              Sensibilidad del modelo: {round(model_eg_per$cm$byClass[c('Sensitivity')], 2)} | Especificidad: {round(model_eg_per$cm$byClass[c('Specificity')], 2)}\n
                              Cutoff de proporción: {best_cutoff('eg', 'per')}"),
-       caption = "Elaboración propia con base en el modelo de Gradient Boosting.")
+       caption = "Elaboración propia con base en el modelo de Gradient Boosting.") +
+  theme_bw() +
+  theme(plot.title = element_markdown(),
+        plot.subtitle = element_markdown())
 
 ### Incidencia ----
 
@@ -96,25 +105,30 @@ mun_mapa %>%
 mun_mapa %>%
   ggplot(aes(fill = corrup_eg_inc)) +
   geom_sf() +
-  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FF0000", "#00BFC4")) +
-  theme_bw() +
-  labs(title = bquote("Clasificación"~bold("real")~"de corrupción de los municipios con base en sus"~bold("egresos")),
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#ffed00", "#0012ff")) +
+  labs(title = "Clasificación<b>real</b> de corrupción de los municipios con base en sus <span style='color:#008dff;'>egresos</span>",
        subtitle = glue::glue("Total de municipios encuestados en la ENCIG: {sum(!is.na(eg_inc_predicted$corrup_eg_inc))}\n
                              Cutoff de proporción: {best_cutoff('eg', 'inc')}"),
-       caption = "Elaboración propia con datos de la ENCIG 2019.")
+       caption = "Elaboración propia con datos de la ENCIG 2019.") +
+  theme_bw() +
+  theme(plot.title = element_markdown(),
+        plot.subtitle = element_markdown())
 
 #### Etiquetas predichas ----
 mun_mapa %>%
   ggplot(aes(fill = factor(corrup_hat_eg_inc, levels = c("corrupto", "no_corrupto")))) +
   geom_sf() +
-  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FF0000", "#00BFC4")) +
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#ffed00", "#0012ff")) +
   theme_bw() +
-  labs(title = bquote("Clasificación"~bold("predicha")~"de corrupción de los municipios con base en sus"~bold("egresos")),
-       subtitle = glue::glue("Modelo de incidencia\n
+  labs(title = "Clasificación<b>predicha</b> de corrupción de los municipios con base en sus <span style='color:#008dff;'>egresos</span>",
+       subtitle = glue::glue("Modelo de <b><span style='color:#0012ff;'>incidencia</span></b>\n
                              Total de municipios modelados: {nrow(eg_inc_predicted)}\n
                              Sensibilidad del modelo: {round(model_eg_inc$cm$byClass[c('Sensitivity')], 2)} | Especificidad: {round(model_eg_inc$cm$byClass[c('Specificity')], 2)}\n
                              Cutoff de proporción: {best_cutoff('eg', 'inc')}"),
-       caption = "Elaboración propia con base en el modelo de Gradient Boosting.")
+       caption = "Elaboración propia con base en el modelo de Gradient Boosting.") +
+  theme_bw() +
+  theme(plot.title = element_markdown(),
+        plot.subtitle = element_markdown())
 
 ## Ingresos ----
 
@@ -124,26 +138,29 @@ mun_mapa %>%
 mun_mapa %>%
   ggplot(aes(fill = corrup_ig_per)) +
   geom_sf() +
-  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FFA600", "#00BFC4")) +
-  theme_bw() +
-  labs(title = bquote("Clasificación"~bold("real")~"de corrupción de los municipios con base en sus"~bold("ingresos")),
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#9c002e", "#009c6e")) +
+  labs(title = "Clasificación<b>real</b> de corrupción de los municipios con base en sus <span style='color:#006d16;'>ingresos</span>",
        subtitle = glue::glue("Total de municipios encuestados en la ENCIG: {sum(!is.na(ig_per_predicted$corrup_ig_per))}\n
                              Cutoff de proporción: {best_cutoff('ig', 'per')}"),
-       caption = "Elaboración propia con datos de la ENCIG 2019.")
-
+       caption = "Elaboración propia con datos de la ENCIG 2019.") +
+  theme_bw() +
+  theme(plot.title = element_markdown(),
+        plot.subtitle = element_markdown())
 
 #### Predichas ----
 mun_mapa %>%
   ggplot(aes(fill = factor(corrup_hat_ig_per, levels = c("corrupto", "no_corrupto")))) +
   geom_sf() +
-  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FFA600", "#00BFC4")) +
-  theme_bw() +
-  labs(title = bquote("Clasificación"~bold("predicha")~"de corrupción de los municipios con base en sus"~bold("ingresos")),
-       subtitle = glue::glue("Modelo de percepción\n
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#9c002e", "#009c6e")) +
+  labs(title = "Clasificación predicha de corrupción de los municipios con base en sus <span style='color:#006d16;'>ingresos</span>",
+       subtitle = glue::glue("Modelo de <b><span style='color:#4cdd69;'>percepción</span></b>\n
                              Total de municipios modelados: {nrow(ig_per_predicted)}\n
                              Sensibilidad del modelo: {round(model_ig_per$cm$byClass[c('Sensitivity')], 2)} | Especificidad: {round(model_ig_per$cm$byClass[c('Specificity')], 2)}\n
                              Cutoff de proporción: {best_cutoff('ig', 'per')}"),
-       caption = "Elaboración propia con base en el modelo de Gradient Boosting.")
+       caption = "Elaboración propia con base en el modelo de Gradient Boosting.") +
+  theme_bw() +
+  theme(plot.title = element_markdown(),
+        plot.subtitle = element_markdown())
 
 ### Incidencia ----
 
@@ -151,24 +168,28 @@ mun_mapa %>%
 mun_mapa %>%
   ggplot(aes(fill = corrup_ig_inc)) +
   geom_sf() +
-  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FF0000", "#00BFC4")) +
-  theme_bw() +
-  labs(title = bquote("Clasificación"~bold("real")~"de corrupción de los municipios con base en sus"~bold("ingresos")),
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#9c007c", "#009C20")) +
+  labs(title = "Clasificación<b>real</b> de corrupción de los municipios con base en sus <span style='color:#006d16;'>ingresos</span>",
        subtitle = glue::glue("Total de municipios encuestados en la ENCIG: {sum(!is.na(ig_inc_predicted$corrup_ig_inc))}\n
                              Cutoff de proporción: {best_cutoff('ig', 'inc')}"),
-       caption = "Elaboración propia con datos de la ENCIG 2019.")
+       caption = "Elaboración propia con datos de la ENCIG 2019.") +
+  theme_bw() +
+  theme(plot.title = element_markdown(),
+        plot.subtitle = element_markdown())
 
 #### Etiquetas predichas ----
 mun_mapa %>%
   ggplot(aes(fill = factor(corrup_hat_ig_inc, levels = c("corrupto", "no_corrupto")))) +
   geom_sf() +
-  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#FF0000", "#00BFC4")) +
-  theme_bw() +
-  labs(title = bquote("Clasificación"~bold("predicha")~"de corrupción de los municipios con base en sus ingresos"),
-       subtitle = glue::glue("Modelo de incidencia\n
+  scale_fill_discrete(name = "", labels = c("Corrupto", "No corrupto", "Sin información"), type = c("#9c007c", "#009C20")) +
+  labs(title = "Clasificación predicha de corrupción de los municipios con base en sus <span style='color:#006d16;'>ingresos</span>",
+       subtitle = glue::glue("Modelo de <b><span style='color:#009C20;'>incidencia</span></b>\n
                              Total de municipios modelados: {nrow(ig_inc_predicted)}\n
                              Sensibilidad del modelo: {round(model_ig_inc$cm$byClass[c('Sensitivity')], 2)} | Especificidad: {round(model_ig_inc$cm$byClass[c('Specificity')], 2)}\n
                              Cutoff de proporción: {best_cutoff('ig', 'inc')}"),
-       caption = "Elaboración propia con base en el modelo de Gradient Boosting.")
+       caption = "Elaboración propia con base en el modelo de Gradient Boosting.") +
+  theme_bw() +
+  theme(plot.title = element_markdown(),
+        plot.subtitle = element_markdown())
 
 
