@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.pos="H"
 ```{r librerias, echo=FALSE}
 # Librerias ----
 library(tidyverse)
-library(ggtext)
+# library(ggtext)
 library(here)
 library(kableExtra)
 ```
@@ -98,17 +98,85 @@ La novedad de estos nuevos modelos es que incorporan los datos del censo económ
 
 
 ```{r variables_censo, echo=FALSE}
-variables_censo <- read_csv(here("./reports/variables_censo.csv"))
+variables_censo <- read_csv(here("./reports/variables_censo.csv"), skip = 1)
 kable(variables_censo, 
                  align = "c", 
                  format = "latex",
-                 caption = "") %>%
+                 caption = "Variables del censo económico 2019") %>%
   kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
 ```
 
-Cada una de estas variables fue repetida por cada sector económico de acuerdo a la clasificación del Sistema de Clasificación Industrial de América del Norte 2018 (SCIAN 2018), el cual contiene 20 grandes sectores. El número de total de variables construídas con los datos del censo económico resultó en 187. Sumado a las variables de las finanzas públicas, los conjuntos de datos de egresos cuentan con más de 500 variables explicativas y los conjuntos de ingresos con más de 300 variables explicativas.
+Cada una de estas variables fue repetida por cada sector económico de acuerdo a la clasificación del Sistema de Clasificación Industrial de América del Norte 2018 (SCIAN 2018), el cual contiene 20 grandes sectores. El número total de variables construídas con los datos del censo económico resultó en 187. Sumado a las variables de las finanzas públicas, los conjuntos de datos de egresos cuentan con más de 500 variables explicativas y los conjuntos de ingresos con más de 300 variables explicativas.
 
 # Desempeño de los modelos entrenados
 
+En la siguiente tabla se muestran las métricas de evaluación de cada modelo entrenado.En general, el desempeño de los modelos mostró una mejoría al incluir las variables del censo económico, especialmente en el aspecto de la sensibilidad, es decir, la capacidad para clasificar municipios corruptos de manera correcta.
 
+En el caso de los modelos de egresos, tanto el de percepción como el de incidencia obtuvieron buenos resultados de F1 score, lo cual indica que son modelos balanceados y que es posible confiar en sus resultados. Por otro lado, los modelos de ingresos no obtuvieron tan buenos reultados, por ejemplo, el modelo entrenado con la variable de interés que corresponde a la percepción cuenta con una sensibilidad de 0, es decir, no es nada capaz de clasificar correctamente a los municipios corruptos; en este caso, esta deficiencia puede atribuirse a dos factores: 1) método de optimización para elegir el umbral para la clasificación de corrupción y 2) la menor cantidad de variables que integran el conjunto de datos de ingresos (337 vs 533 del conjunto de egresos). Por lo anterior, tal vez valdría la pena crear modelos que integren a los egresos e ingresos.
 
+```{r, desempeno, echo=FALSE}
+sum_model <- function(model_cm, name){
+  cm <- model_cm
+  data.frame(Modelo = c(name),
+             Sensibilidad = c(round(c(cm$byClass[c("Sensitivity")]), 2)),
+             Especificidad = c(round(c(cm$byClass[c("Specificity")]), 2)),
+             F1_score = round(c(cm$byClass[c("F1")]), 2),
+             Precisión_balanceada = round(c(cm$byClass[c("Balanced Accuracy")]), 2))
+}
+
+desemp <- rbind(sum_model(model_eg_per$cm, "Egresos - Percepción"), 
+      sum_model(model_eg_inc$cm, "Egresos - Incidencia"),
+      sum_model(model_ig_per$cm, "Ingresos - Percepción"),
+      sum_model(model_ig_inc$cm, "Ingresos - Incidencia"),
+      make.row.names = FALSE)
+
+kable(desemp, 
+      align = "c", 
+      format = "latex",
+      caption = "Comparación de desempeño") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+## Variables más importantes de cada modelo
+
+Retomando una de las ventajas planteadas de los modelos de clasificación, la cual es la capacidad para reportar cuáles son las variables que mayor importancia tienen en el algoritmo de decisión, en esta sección se presentan las variables que mayor importancia tienen en cada modelo entrenado.
+
+### Egresos - Percepción
+
+```{r eg_per_vars, echo=FALSE}
+kable(model_eg_per$var_imp, 
+      align = "c", 
+      format = "latex",
+      caption = "Variables más importantes. Egresos - Percepción") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+### Egresos - Incidencia
+
+```{r eg_inc_vars, echo=FALSE}
+kable(model_eg_per$var_imp, 
+      align = "c", 
+      format = "latex",
+      caption = "Variables más importantes. Egresos - Incidencia") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+### Ingresos - Percepción
+
+```{r ig_per_vars, echo=FALSE}
+kable(model_ig_per$var_imp, 
+      align = "c", 
+      format = "latex",
+      caption = "Variables más importantes. Ingresos - Percepción") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+### Ingresos - Incidencia
+
+```{r ig_inc_vars, echo=FALSE}
+kable(model_ig_inc$var_imp, 
+      align = "c", 
+      format = "latex",
+      caption = "Variables más importantes. Ingresos - Incidencia") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
