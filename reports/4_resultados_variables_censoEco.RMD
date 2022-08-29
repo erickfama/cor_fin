@@ -141,40 +141,35 @@ kable(desemp,
 
 Retomando una de las ventajas planteadas de los modelos de clasificación, la cual es la capacidad para reportar cuáles son las variables que mayor importancia tienen en el algoritmo de decisión, en esta sección se presentan las variables que mayor importancia tienen en cada modelo entrenado.
 
-### Egresos - Percepción
-
 ```{r eg_per_vars, echo=FALSE}
-kable(model_eg_per$var_imp, 
+kable(model_eg_per$var_imp$importance %>% slice_head(n = 10), 
       align = "c", 
       format = "latex",
       caption = "Variables más importantes. Egresos - Percepción") %>%
   kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
 ```
 
-### Egresos - Incidencia
 
 ```{r eg_inc_vars, echo=FALSE}
-kable(model_eg_per$var_imp, 
+kable(model_eg_inc$var_imp$importance %>% slice_head(n = 10), 
       align = "c", 
       format = "latex",
       caption = "Variables más importantes. Egresos - Incidencia") %>%
   kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
 ```
 
-### Ingresos - Percepción
 
 ```{r ig_per_vars, echo=FALSE}
-kable(model_ig_per$var_imp, 
+kable(model_ig_per$var_imp$importance %>% slice_head(n = 10), 
       align = "c", 
       format = "latex",
       caption = "Variables más importantes. Ingresos - Percepción") %>%
   kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
 ```
 
-### Ingresos - Incidencia
 
 ```{r ig_inc_vars, echo=FALSE}
-kable(model_ig_inc$var_imp, 
+kable(model_ig_inc$var_imp$importance %>% slice_head(n = 10), 
       align = "c", 
       format = "latex",
       caption = "Variables más importantes. Ingresos - Incidencia") %>%
