@@ -1,0 +1,186 @@
+---
+title: "Activities Report No. 4"
+subtitle: "Models trained with Economic Census data"
+author:
+- "Research assistant: Erick Gabriel Fajardo Martínez"
+- "Researcher: Dr. Gabriel Purón Cid"
+date: '`r format(Sys.time(), "%d %B %Y")`'
+fontsize: 12pt
+output:   
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+ \usepackage{float}
+---
+
+```{r setup, include=FALSE}
+Sys.setlocale("LC_TIME", "English")
+set.seed(123)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.pos="H")
+```
+
+```{r librerias, echo=FALSE}
+# Librerias ----
+library(tidyverse)
+# library(ggtext)
+library(here)
+library(kableExtra)
+```
+
+```{r lectura, echo=FALSE}
+## Egresos ----
+eg_per_predicted <- read_csv(here("./data/3_final/eg_per_predicted.csv")) %>%
+  rename(corrup_hat_eg_per = corrup_hat, corrup_eg_per = corrup)
+eg_inc_predicted <- read_csv(here("./data/3_final/eg_inc_predicted.csv")) %>%
+  rename(corrup_hat_eg_inc = corrup_hat, corrup_eg_inc = corrup)
+
+## Ingresos ----
+ig_per_predicted <- read_csv(here("./data/3_final/ig_per_predicted.csv")) %>%
+  rename(corrup_hat_ig_per = corrup_hat, corrup_ig_per = corrup)
+ig_inc_predicted <- read_csv(here("./data/3_final/ig_inc_predicted.csv")) %>%
+  rename(corrup_hat_ig_inc = corrup_hat, corrup_ig_inc = corrup)
+
+## Modelos ----
+model_eg_per <- readRDS(here("./models/model_eg_per.rds"))
+model_eg_inc <- readRDS(here("./models/model_eg_inc.rds"))
+model_ig_per <- readRDS(here("./models/model_ig_per.rds"))
+model_ig_inc <- readRDS(here("./models/model_ig_inc.rds"))
+
+## Mapa ----
+mun_mapa <- sf::read_sf(here("./data/maps/muni.shp"))
+
+# cutoff 
+best_cutoff <- function(tipo_fin, method){
+  if(tipo_fin == "eg"){
+    cutoff <- read_csv("./data/2_interim/eval_eg.csv", locale = locale(encoding = "UTF-8"), show_col_types = FALSE) %>%
+      select(method, best_cutoff) 
+    if(method == "per"){
+      value <- cutoff %>% filter(method == "Percepción") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    } else {
+      value <- cutoff %>% filter(method == "Incidencia") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    }
+  } 
+  if(tipo_fin == "ig"){
+    cutoff <- read_csv("./data/2_interim/eval_ig.csv", locale = locale(encoding = "latin1"), show_col_types = FALSE) %>%
+      select(method, best_cutoff) 
+    if(method == "per"){
+      value <- cutoff %>% filter(method == "Percepción") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    } else {
+      value <- cutoff %>% filter(method == "Incidencia") %>% select(best_cutoff) %>% pull() %>% unique() %>% ifelse(is.null(.), 0, .)
+    }
+  }
+  value <- ifelse(is.null(value), 0, value)
+  return(value)
+}
+```
+
+# Summary
+
+Recapitulando, en los reportes anteriores se habían desarrollado y entrenado modelos de aprendizaje máquina utilizando el algoritmo de *Gradient Boosting*, donde la variable de interés es la clasificación de cada municipio (corrupto y no corrupto) y las variables explicativas son los datos sobre las finanzas públicas de cada municipio. Todos los datos sobre las finanzas públicas fueron estandarizados por la población total del municipio. Recordemos que fueron entrenados 4 modelos, los cuales pueden ser clasificados en dos grandes categorías: egresos e ingresos, es decir, modelos entrenados con los respectivos datos de las finanzas públicas; y en subcategorías que corresponden a la construcción de la variable de interés, ya que la clasificación de corrupción fue realizada con la pregunta de percepción y la pregunta de incidencia de la ENCIG 2019. La clasificación de los modelos es resumida de la siguiente manera:
+
+In previous reports Mexican municipalities were classified into corrupt or not corrupt based on ENCIG's 2019 results about perception and incidence of corruption within the municipalitie and public finance data of each municipalitie. Therefore two classifications were made for all municipalities that were included in ENCIG's 2019 sample, one corresponding to the perception component and another to incidence. For the case of perception, municipalities were classified into corrupt or not corrupt by calculating population proportion that reported a high perception of corruption in their municipalitie of residence and if the proportion exceeded a certain threshold the municipalitie was labeled as corrupt and not corrupt otherwise. For the case of incidence, the classification followed the same method but the only difference was in the population proportion which was calculated as the proportion that reported been involved in an act of corruption. The classification has been perfomed with the implementation of *Gradient Boosting* a machine learning algorithm which is a great classification tool for the creation of very accurate models (Burkov, 2019).
+
+Four models were trained of which can be divided into two big categories: 1) Public revenue and 2) Public expenditure; and each of this categories contains two models that correspond to the classification of corruption according to perception and incidence data.The purpose of this is to check if there is any variation across models that can be explained by the use of perception or incidence data about corruption. Models classification is resumed the following way:
+
+\begin{minipage}[t]{0.5\textwidth}
+\textbf{Public expenditure models}\\
+\begin{itemize}
+    \item Classification of corruption according to incidence data\\
+    \item Classification of corruption according to perception data\\
+\end{itemize}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\textbf{Public revenue models}\\
+\begin{itemize}
+    \item Classification of corruption according to incidence data\\
+    \item Classification of corruption according to perception data\\
+\end{itemize}
+\end{minipage}
+
+# Economic Census Data
+
+La novedad de estos nuevos modelos es que incorporan los datos del censo económico 2019, lo cual proporciona una mayor robustes en cuanto a las características que definen los outputs de cada modelo. Las variables elegidas de este conjunto de datos fueron las siguientes:
+
+This report adds up data from the 2019 Economic Census which give a better performance to all models. The variables that were chosen are the following:
+
+```{r variables_censo, echo=FALSE}
+variables_censo <- read_csv(here("./reports/variables_censo.csv"), skip = 1)
+kable(variables_censo, 
+                 align = "c", 
+                 format = "latex",
+                 caption = "2019 Economic Census variables") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+Cada una de estas variables fue repetida por cada sector económico de acuerdo a la clasificación del Sistema de Clasificación Industrial de América del Norte 2018 (SCIAN 2018), el cual contiene 20 grandes sectores. El número total de variables construídas con los datos del censo económico resultó en 187. Sumado a las variables de las finanzas públicas, los conjuntos de datos de egresos cuentan con más de 500 variables explicativas y los conjuntos de ingresos con más de 300 variables explicativas.
+
+Each of this variables are repeated by each economic sector according to 2018 North America's Industrial Classification System, which is divided into 20 main economic sectors. 187 is the total number of variables that were added from the economic census.
+The complete data sets contain more than 500 variables for the case of public revenue, and more than 300 variables for the case of public expenditure.
+
+# Desempeño de los modelos entrenados
+
+En la siguiente tabla se muestran las métricas de evaluación de cada modelo entrenado.En general, el desempeño de los modelos mostró una mejoría al incluir las variables del censo económico, especialmente en el aspecto de la sensibilidad, es decir, la capacidad para clasificar municipios corruptos de manera correcta.
+
+En el caso de los modelos de egresos, tanto el de percepción como el de incidencia obtuvieron buenos resultados de F1 score, lo cual indica que son modelos balanceados y que es posible confiar en sus resultados. Por otro lado, los modelos de ingresos no obtuvieron tan buenos reultados, por ejemplo, el modelo entrenado con la variable de interés que corresponde a la percepción cuenta con una sensibilidad de 0, es decir, no es nada capaz de clasificar correctamente a los municipios corruptos; en este caso, esta deficiencia puede atribuirse a dos factores: 1) método de optimización para elegir el umbral para la clasificación de corrupción y 2) la menor cantidad de variables que integran el conjunto de datos de ingresos (337 vs 533 del conjunto de egresos). Por lo anterior, tal vez valdría la pena crear modelos que integren a los egresos e ingresos.
+
+```{r, desempeno, echo=FALSE}
+sum_model <- function(model_cm, name){
+  cm <- model_cm
+  data.frame(Modelo = c(name),
+             Sensibilidad = c(round(c(cm$byClass[c("Sensitivity")]), 2)),
+             Especificidad = c(round(c(cm$byClass[c("Specificity")]), 2)),
+             F1_score = round(c(cm$byClass[c("F1")]), 2),
+             Precisión_balanceada = round(c(cm$byClass[c("Balanced Accuracy")]), 2))
+}
+
+desemp <- rbind(sum_model(model_eg_per$cm, "Egresos - Percepción"), 
+      sum_model(model_eg_inc$cm, "Egresos - Incidencia"),
+      sum_model(model_ig_per$cm, "Ingresos - Percepción"),
+      sum_model(model_ig_inc$cm, "Ingresos - Incidencia"),
+      make.row.names = FALSE)
+
+kable(desemp, 
+      align = "c", 
+      format = "latex",
+      caption = "Comparación de desempeño") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+## Variables más importantes de cada modelo
+
+Retomando una de las ventajas planteadas de los modelos de clasificación, la cual es la capacidad para reportar cuáles son las variables que mayor importancia tienen en el algoritmo de decisión, en esta sección se presentan las variables que mayor importancia tienen en cada modelo entrenado.
+
+```{r eg_per_vars, echo=FALSE}
+kable(model_eg_per$var_imp$importance %>% slice_head(n = 10), 
+      align = "c", 
+      format = "latex",
+      caption = "Variables más importantes. Egresos - Percepción") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+
+```{r eg_inc_vars, echo=FALSE}
+kable(model_eg_inc$var_imp$importance %>% slice_head(n = 10), 
+      align = "c", 
+      format = "latex",
+      caption = "Variables más importantes. Egresos - Incidencia") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+
+```{r ig_per_vars, echo=FALSE}
+kable(model_ig_per$var_imp$importance %>% slice_head(n = 10), 
+      align = "c", 
+      format = "latex",
+      caption = "Variables más importantes. Ingresos - Percepción") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+
+```{r ig_inc_vars, echo=FALSE}
+kable(model_ig_inc$var_imp$importance %>% slice_head(n = 10), 
+      align = "c", 
+      format = "latex",
+      caption = "Variables más importantes. Ingresos - Incidencia") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
