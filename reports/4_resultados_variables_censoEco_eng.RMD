@@ -76,8 +76,6 @@ best_cutoff <- function(tipo_fin, method){
 
 # Summary
 
-Recapitulando, en los reportes anteriores se habían desarrollado y entrenado modelos de aprendizaje máquina utilizando el algoritmo de *Gradient Boosting*, donde la variable de interés es la clasificación de cada municipio (corrupto y no corrupto) y las variables explicativas son los datos sobre las finanzas públicas de cada municipio. Todos los datos sobre las finanzas públicas fueron estandarizados por la población total del municipio. Recordemos que fueron entrenados 4 modelos, los cuales pueden ser clasificados en dos grandes categorías: egresos e ingresos, es decir, modelos entrenados con los respectivos datos de las finanzas públicas; y en subcategorías que corresponden a la construcción de la variable de interés, ya que la clasificación de corrupción fue realizada con la pregunta de percepción y la pregunta de incidencia de la ENCIG 2019. La clasificación de los modelos es resumida de la siguiente manera:
-
 In previous reports Mexican municipalities were classified into corrupt or not corrupt based on ENCIG's 2019 results about perception and incidence of corruption within the municipalitie and public finance data of each municipalitie. Therefore two classifications were made for all municipalities that were included in ENCIG's 2019 sample, one corresponding to the perception component and another to incidence. For the case of perception, municipalities were classified into corrupt or not corrupt by calculating population proportion that reported a high perception of corruption in their municipalitie of residence and if the proportion exceeded a certain threshold the municipalitie was labeled as corrupt and not corrupt otherwise. For the case of incidence, the classification followed the same method but the only difference was in the population proportion which was calculated as the proportion that reported been involved in an act of corruption. The classification has been perfomed with the implementation of *Gradient Boosting* a machine learning algorithm which is a great classification tool for the creation of very accurate models (Burkov, 2019).
 
 Four models were trained of which can be divided into two big categories: 1) Public revenue and 2) Public expenditure; and each of this categories contains two models that correspond to the classification of corruption according to perception and incidence data.The purpose of this is to check if there is any variation across models that can be explained by the use of perception or incidence data about corruption. Models classification is resumed the following way:
@@ -99,8 +97,6 @@ Four models were trained of which can be divided into two big categories: 1) Pub
 
 # Economic Census Data
 
-La novedad de estos nuevos modelos es que incorporan los datos del censo económico 2019, lo cual proporciona una mayor robustes en cuanto a las características que definen los outputs de cada modelo. Las variables elegidas de este conjunto de datos fueron las siguientes:
-
 This report adds up data from the 2019 Economic Census which give a better performance to all models. The variables that were chosen are the following:
 
 ```{r variables_censo, echo=FALSE}
@@ -112,20 +108,14 @@ kable(variables_censo,
   kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
 ```
 
-Cada una de estas variables fue repetida por cada sector económico de acuerdo a la clasificación del Sistema de Clasificación Industrial de América del Norte 2018 (SCIAN 2018), el cual contiene 20 grandes sectores. El número total de variables construídas con los datos del censo económico resultó en 187. Sumado a las variables de las finanzas públicas, los conjuntos de datos de egresos cuentan con más de 500 variables explicativas y los conjuntos de ingresos con más de 300 variables explicativas.
-
 All the variables are repeated by each economic sector according to 2018 North America's Industrial Classification System, which is divided into 20 main economic sectors. 187 is the total number of variables that were added from the economic census.
 The complete data sets contain more than 500 variables for the case of public revenue, and more than 300 variables for the case of public expenditure.
 
 # Model performance
 
-En la siguiente tabla se muestran las métricas de evaluación de cada modelo entrenado.En general, el desempeño de los modelos mostró una mejoría al incluir las variables del censo económico, especialmente en el aspecto de la sensibilidad, es decir, la capacidad para clasificar municipios corruptos de manera correcta.
-
 The following table shows evaluation metrics for each trained model. Overall, model performance is improved by including data from the economic census, and this improvement is better shown in the sensibility of the models which is their hability of correctly classify corrupt municipalities.
 
 Another improvement were in F1-score values for public expenditure models, meaning that both types of models are more balanced in terms of sensitivity and specificity. On the other hand, public revenue models did not show better results which can be explained by two reasons: 1) Optimization method used to set the treshold for initial classification and 2) lower number of total variables in the public revenue dataset.
-
-En el caso de los modelos de egresos, tanto el de percepción como el de incidencia obtuvieron buenos resultados de F1 score, lo cual indica que son modelos balanceados y que es posible confiar en sus resultados. Por otro lado, los modelos de ingresos no obtuvieron tan buenos reultados, por ejemplo, el modelo entrenado con la variable de interés que corresponde a la percepción cuenta con una sensibilidad de 0, es decir, no es nada capaz de clasificar correctamente a los municipios corruptos; en este caso, esta deficiencia puede atribuirse a dos factores: 1) método de optimización para elegir el umbral para la clasificación de corrupción y 2) la menor cantidad de variables que integran el conjunto de datos de ingresos (337 vs 533 del conjunto de egresos). Por lo anterior, tal vez valdría la pena crear modelos que integren a los egresos e ingresos.
 
 ```{r, desempeno, echo=FALSE}
 sum_model <- function(model_cm, name){
@@ -188,3 +178,7 @@ kable(model_ig_inc$var_imp$importance %>% slice_head(n = 10),
       caption = "Variable importance. Revenue - Incidence") %>%
   kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
 ```
+
+# Reference
+
+Burkov, A. (2019). *The hundred-page machine learning book.* Andriy Burkov
