@@ -27,6 +27,9 @@ ce_dicc <- read_csv("./data/1_raw/diccionario_de_datos_ce2019.csv") %>%
   janitor::clean_names() %>%
   mutate(columna = str_to_lower(columna))
 
+# Diccionario efipem ----
+efipem_dicc <- read_csv("./data/2_interim/efipem19_clean.csv")
+
 # Diccionario Egresos ----
 
 # Variables genéricas
@@ -40,6 +43,7 @@ eg_dicc_per <- data.frame(variables = var_names_eg)
 eg_dicc_per$descripcion <- c()
 eg_dicc_per[1:9, "descripcion"] <- vars_genericas_per
 
+# Censo
 for(i in ce_dicc$columna){
   if(i %in% str_extract(eg_dicc_per$variable, "^[a-z][0-9]+[a-z]")){
     descrip <- ce_dicc[which(ce_dicc$columna == i), "descripcion"]
@@ -47,12 +51,34 @@ for(i in ce_dicc$columna){
   }
 }
 
+# SCIAN
 for(i in scian_dicc$codigo){
   if(i %in% str_extract(eg_dicc_per$variable, "\\d*$")){
     descrip <- scian_dicc[which(scian_dicc$codigo == i), "titulo"]
     eg_dicc_per[which(str_extract(eg_dicc_per$variable, "\\d*$") == i), "descripcion"] <- paste(unique(eg_dicc_per[which(str_extract(eg_dicc_per$variable, "\\d*$") == i), "descripcion"]), descrip, sep = ";")
   }
 }
+
+# Efipem 
+# efipem_dicc$descrip <- 1
+# idx_caps <- which(efipem_dicc$categoria == "capitulo")
+# for(i in seq(1, length(idx_caps))){
+#   descrip <- efipem_dicc$descripcion_categoria[idx_caps[i]]
+#   if(i == 1){
+#     interval <- seq(idx_caps[i], idx_caps[i + 1])
+#     sapply(interval, function(x){efipem_dicc$descrip[x] <- descrip})
+#   }
+#   if(i == length(idx_caps)){
+#     interval <- seq(idx_caps[i], nrow(efipem_dicc))
+#     sapply(interval, function(x){efipem_dicc$descrip[x] <- descrip}) 
+#   }
+#   else{
+#     interval <- seq(idx_caps[i], idx_caps[i + 1])
+#     sapply(interval, function(x){efipem_dicc$descrip[x] <- descrip}) 
+#   }
+# }
+
+
 
 ## Incidencia ----
 
@@ -118,3 +144,10 @@ for(i in scian_dicc$codigo){
     ig_dicc_inc[which(str_extract(ig_dicc_inc$variable, "\\d*$") == i), "descripcion"] <- paste(unique(ig_dicc_inc[which(str_extract(ig_dicc_inc$variable, "\\d*$") == i), "descripcion"]), descrip, sep = ";")
   }
 }
+
+# Escritura ----
+write.csv(eg_dicc_per, "./data/3_final/eg_per_dicc.csv", row.names = FALSE, fileEncoding = "latin1")
+write.csv(eg_dicc_inc, "./data/3_final/eg_inc_dicc.csv", row.names = FALSE, fileEncoding = "latin1")
+
+write.csv(ig_dicc_per, "./data/3_final/ig_per_dicc.csv", row.names = FALSE, fileEncoding = "latin1")
+write.csv(ig_dicc_inc, "./data/3_final/ig_inc_dicc.csv", row.names = FALSE, fileEncoding = "latin1")
