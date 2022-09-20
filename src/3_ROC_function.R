@@ -7,7 +7,7 @@ library(xgboost)
 
 # ROC ----
 
-ROC <- function(data, method_name, props_values, seed = TRUE){
+ROC <- function(data, method_name, algorithm = "xgbTree", props_values, seed = TRUE){
   
   # Lectura 
   if(is.character(data) == TRUE){
@@ -40,7 +40,7 @@ ROC <- function(data, method_name, props_values, seed = TRUE){
     # Training
     model <- train(corrup ~ ., 
                    data = train_set, 
-                   method = "xgbTree",
+                   method = algorithm,
                    trControl = trainControl("cv", number = 5))
     
     # Ajuste con test set
