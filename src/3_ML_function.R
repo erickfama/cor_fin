@@ -7,7 +7,7 @@ library(xgboost)
 
 # Funcion ----
 
-gb_model <- function(data, cutoff = 0, seed = TRUE){
+gb_model <- function(data, cutoff = 0, seed = TRUE, algorithm = "xgbTree"){
   if(seed == TRUE){
     set.seed(123)
   }
@@ -34,7 +34,7 @@ gb_model <- function(data, cutoff = 0, seed = TRUE){
   # Training
   model <- train(corrup ~ ., 
                  data = train_set, 
-                 method = "xgbTree",
+                 method = algorithm,
                  trControl = trainControl("cv", number = 5))
   
   # Ajuste con test set
