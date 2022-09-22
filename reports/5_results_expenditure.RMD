@@ -77,20 +77,24 @@ The complete data set contains more than 500 variables for the case of public ex
 
 # Model performance
 
+The following table shows evaluation metrics for the trained model. Overall, model performance is good with an accuracy of 0.78 this performance was improved by adding data from the economic census (in comparison with previous models that we trained and didn't include those variables), and this improvement is better shown in the sensibility of the models which is their hability of correctly classify corrupt municipalities. In that sense, these model has a good predicting power to identify corrupt municipalities, and is reflected on the F1-score which value is 0.86. On the other hand, these model is not very good at detecting not corrupt municipalities according to the specificity value of 0.44, that is the reason for a lower balanced accuracy (0.67). However, in terms of public policy, it is prefer to have a good corrupt detection rate **[insert citation]** to ensure the right focus of regulations programs like audits.
+
 ```{r, desempeno, echo=FALSE}
 sum_model <- function(model_cm, name){
   cm <- model_cm
-  data.frame(Modelo = c(name),
-             Sensibilidad = c(round(c(cm$byClass[c("Sensitivity")]), 2)),
-             Especificidad = c(round(c(cm$byClass[c("Specificity")]), 2)),
-             F1_score = round(c(cm$byClass[c("F1")]), 2),
-             Precisión_balanceada = round(c(cm$byClass[c("Balanced Accuracy")]), 2))
+  data.frame(Model = c(name),
+             Accuracy = c(round(c(cm$overall["Accuracy"]), 2)),
+             Sensitivity = c(round(c(cm$byClass[c("Sensitivity")]), 2)),
+             Specificity = c(round(c(cm$byClass[c("Specificity")]), 2)),
+             F1 = round(c(cm$byClass[c("F1")]), 2),
+             `Balanced Accuracy` = round(c(cm$byClass[c("Balanced Accuracy")]), 2),
+             row.names = NULL)
 }
 
 desemp <- sum_model(model_eg_inc$cm, "Expenditure - Incidence")
 
 kable(desemp, 
       align = "c", 
-      caption = "Performance") %>%
+      caption = "Table. Performance") %>%
   kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
 ```
