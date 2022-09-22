@@ -64,7 +64,7 @@ best_cutoff <- function(tipo_fin, method){
 
 ## ENCIG 2019
 
-The following data was used to train the model. First, ENCIG 2019 survey results were used to classify municipalities into corrupt and not corrupt, the corruption section of the survey captures incidence of corruption within municipalitie by asking for any kind of involvement in a corruption act in the last five years. To create the classification of corrupt and not corrupt municipalities, first we calculated the proportion of people that reported been involved in an act of corruption, then stablished a proportion threshold which, according to each municipalitie population proportion, determined if a municipalitie was corrupt or not. This resulted in 172 municipalities classified.
+The following data was used to train the model. First, ENCIG 2019 survey results were used to classify municipalities into corrupt and not corrupt, the corruption section of the survey captures incidence of corruption within municipalitie by asking for any kind of involvement in a corruption act in the last five years. To determine the classification of corrupt and not corrupt municipalities, first we calculated the proportion of people who reported involvement in an act of corruption, then established a proportion threshold which, according to each municipalitie population proportion, determined if a municipalitie was corrupt or not. This resulted in 172 municipalities classified.
 
 ## EFIPEM 2019
 
@@ -72,8 +72,8 @@ The features we used were obtained from the EFIPEM 2019 data set which is an ann
 
 ## Economic Census 2019
 
-We also decided to add another set of variables to give more context to our model, because there are municipalities that are more different than others, i.e. municipalities from south states as Oaxaca, Chiapas, Tabasco, in comparison with municipalities from north states like Nuevo León, Baja California, Chihuahua. For that reason data from the economic census 2019 was added. First we selected relevant variables and categorized by industrial sector according to 2018 North America's Industrial Classification System, which is divided into 20 main economic sectors. 187 is the total number of variables that were added from the economic census. We also added two variables from the Population Census 2020, which are total population of each municipalitie and average scholar level.
-The complete data set contain more than 500 variables for the case of public expenditure.
+We also decided to add another set of variables to give more context to our model, because there are municipalities that are far different than others, i.e. municipalities from southern states as Oaxaca, Chiapas, Tabasco, in comparison with municipalities from northern states like Nuevo León, Baja California, Chihuahua. For that reason data from the economic census 2019 was added. First we selected relevant variables and categorized them by industrial sector according to 2018 North America's Industrial Classification System, which is divided into 20 main economic sectors. 187 is the total number of variables that were added from the economic census. We also added two variables from the Population Census 2020, which are total population of each municipalitie and average scholar level.
+The complete data set contains more than 500 variables for the case of public expenditure.
 
 # Model performance
 
