@@ -7,13 +7,11 @@ source("./src/3_Optim_function.R")
 # Egresos ----
 
 ## Lectura ----
-eg_per <- read_fst("./data/3_final/egresos19_per_clean.fst")
 eg_inc <- read_fst("./data/3_final/egresos19_inc_clean.fst")
 
 ## Metricas ----
-eval_eg_per <- Optim(eg_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
 eval_eg_inc <- Optim(eg_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
-eval_eg <- rbind(eval_eg_per, eval_eg_inc)
+eval_eg <- rbind(eval_eg_inc)
 
 ## Escritura ----
 write_csv(eval_eg, "./data/2_interim/eval_eg.csv")
@@ -37,13 +35,11 @@ eval_eg %>%
 # Ingresos ----
 
 ## Lectura ----
-ig_per <- read_fst("./data/3_final/ingresos19_per_clean.fst")
 ig_inc <- read_fst("./data/3_final/ingresos19_inc_clean.fst")
 
 ## Metricas ----
-eval_ig_per <- Optim(ig_per, method_name = "Percepción", props_values = seq(0, 20, length.out = 21))
 eval_ig_inc <- Optim(ig_inc, method_name = "Incidencia", props_values = seq(0, 20, length.out = 21))
-eval_ig <- rbind(eval_ig_per, eval_ig_inc)
+eval_ig <- rbind(eval_ig_inc)
 
 ## Escritura ----
 write.csv(eval_ig, "./data/2_interim/eval_ig.csv", row.names = FALSE)
