@@ -30,7 +30,7 @@ eg_inc_predicted <- read_csv(here("./data/3_final/eg_inc_predicted.csv")) %>%
   rename(corrup_hat_eg_inc = corrup_hat, corrup_eg_inc = corrup)
 
 ## Modelos ----
-model_eg_inc <- readRDS(here("./models/model_eg_inc.rds"))
+model_eg_inc <- readRDS(here::here("./models/model_eg_inc.rds"))
 
 ## Mapa ----
 mun_mapa <- sf::read_sf(here("./data/maps/muni.shp"))
@@ -98,3 +98,36 @@ kable(desemp,
       caption = "Table. Performance") %>%
   kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
 ```
+
+## Results
+
+Gradient boosting (as others Tree based algorithms) has the feature of variable importance which is a score that indicates the relative contribution of each feature in predicting the outcome (Friedman et al., 2009). This score goes from 100 to 0, were 100 indicates the most important variable and 0 the less important variable. Table.x list the 20 most important variables.
+
+```{r eg_inc_vars, echo=FALSE}
+eg_inc_dicc <- read_csv(here::here("./data/3_final/eg_inc_dicc.csv"), locale = locale(encoding = "latin1"))
+
+eg_inc_varimp <- model_eg_inc$var_imp$importance %>%
+  add_rownames(var = "Variables") %>%
+  rename("Importance" = "Overall")
+
+# Loop para reemplazar los codigos de las variables con la descripcion del diccionario
+for(i in seq(1, nrow(eg_inc_varimp))){
+  if(eg_inc_varimp$Variables[i] %in% eg_inc_dicc$variables & !str_detect(eg_inc_varimp$Variables[i], "^partida_generica|^subpartida")){
+    name_index <- which(eg_inc_dicc$variables %in% eg_inc_varimp$Variables[i])
+    eg_inc_varimp$Variables[i] <- eg_inc_dicc$descripcion[name_index]
+  } else {
+    eg_inc_varimp$Variables[i] <- str_to_sentence(str_replace_all(eg_inc_varimp$Variables[i], "_", " "))
+  }
+}
+
+kable(eg_inc_varimp %>% slice_head(n = 20), 
+      align = "c",
+      caption = "Variable importance. Expenditure") %>%
+  kableExtra::kable_styling(position = "center", latex_options = c("scale_down", "HOLD_position"))
+```
+
+As we can see, the most important variables that characterize corrupt municipalities correspond to financial assets related to payroll, financial services, and subsidies; Construction items are also relevant, which is not surprising according to the literature [**insert citation**], especially in articles related to the creation of infrastructure or the acquisition of materials.
+
+# References 
+
+Friedman, J., Hastie, T. & Tibshirani, R. (2009). *The elements of statistical learning: Data mining, inference and prediction* (2nd ed.). Springer.
