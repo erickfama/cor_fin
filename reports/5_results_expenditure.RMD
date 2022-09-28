@@ -140,7 +140,7 @@ As we can see, the most important variables that characterize corrupt municipali
 
 A main application of these contribution is the classification of municipalities that do not have any type of corruption measurement because they were not part of ENCIG's sample, and that is the case for the rest of 1888 municipalities. The model serves as a tool to classify the rest of municipalities based on only in their budget items. The following maps illustrates the difference between the classification maded with ENCIG's data (fig. 1) and model classification (fig. 2).
 
-```{r map, echo=FALSE, fig.align='center', out.width="90%"}
+```{r map, echo=FALSE, fig.align='center', fig.width=5, fig.asp=0.6, dpi = 300}
 ## Predicted
 
 ## Egresos ----
@@ -170,25 +170,31 @@ mun_mapa <- mun_mapa %>%
 #### Etiquetas reales ----
 mun_mapa %>%
   ggplot(aes(fill = corrup_eg_inc)) +
-  geom_sf() +
+  geom_sf(lwd = 0.00001) +
   scale_fill_discrete(name = "", labels = c("Corrupt", "Not corrupt", "Not in ENCIG's sample"), type = c("#cc6f29", "#2986cc")) +
   labs(title = "Figure 1. Actual classification of municipalities",
        subtitle = glue::glue("ENCIG municipalitie sample: {sum(!is.na(eg_inc_predicted$corrup_eg_inc))}"),
        caption = "Note: Own elaboration based on ENCIG 2019 data.") +
   theme_bw() +
-  theme(text = element_text(size = 10))
+  theme(text = element_text(size = 10),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
 
 #### Etiquetas predichas ----
 mun_mapa %>%
   ggplot(aes(fill = factor(corrup_hat_eg_inc, levels = c("corrupto", "no_corrupto")))) +
-  geom_sf() +
+  geom_sf(lwd = 0.00001) +
   scale_fill_discrete(name = "", labels = c("Corrupt", "Not corrupt", "No budget data"), type = c("#cc6f29", "#2986cc")) +
   theme_bw() +
   labs(title = "Figure 2. Predicted classification",
        subtitle = glue::glue("2121 municipalities classified"),
        caption = "Note: Own elaboration based on EFIPEM 2019 data.") +
   theme_bw() +
-  theme(text = element_text(size = 10))
+  theme(text = element_text(size = 10),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
 ```
 
 # References 
