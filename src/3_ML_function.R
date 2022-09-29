@@ -26,8 +26,9 @@ gb_model <- function(data, cutoff = 0, seed = TRUE, algorithm = "xgbTree"){
   }
   
   # Train y test sets 
-  training_samples <- df$corrup %>% 
-    createDataPartition(p = 0.7, list = FALSE)
+  training_samples <- readRDS("./data/2_interim/training_samples.RDS")
+  # training_samples <- df$corrup %>% 
+  #   createDataPartition(p = 0.7, list = FALSE)
   train_set  <- df[training_samples, ]
   test_set <- df[-training_samples, ]
   
@@ -35,7 +36,7 @@ gb_model <- function(data, cutoff = 0, seed = TRUE, algorithm = "xgbTree"){
   model <- train(corrup ~ ., 
                  data = train_set, 
                  method = algorithm,
-                 trControl = trainControl("cv", number = 5))
+                 trControl = trainControl("cv", number = 10))
   
   # Ajuste con test set
   y_hat <- model %>% predict(test_set)
