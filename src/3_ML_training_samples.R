@@ -6,7 +6,8 @@ library(caret)
 library(fst)
 
 # Lectura ----
-eg_inc <- read_fst("./data/3_final/eg_inc_all_clean.fst")
+eg_inc <- read_fst("./data/3_final/eg_inc_all_clean.fst") %>%
+  filter(!is.na(prop_corrup))
 
 eg_inc <- eg_inc %>%
   mutate(across(starts_with("prop"), ~ ifelse(.x > 8, 1, 0), .names = "corrup"),
