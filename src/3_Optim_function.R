@@ -7,7 +7,7 @@ library(xgboost)
 
 # Function ----
 
-Optim <- function(data, method_name, algorithm = "xgbTree", props_values, seed = TRUE){
+Optim <- function(data, method_name, algorithm = "xgbTree", training_samples, props_values, seed = TRUE){
   
   # Lectura 
   if(is.character(data) == TRUE){
@@ -30,8 +30,8 @@ Optim <- function(data, method_name, algorithm = "xgbTree", props_values, seed =
     if(seed == TRUE){
       set.seed(123)
     }
-    training_samples <- df$corrup %>% 
-      createDataPartition(p = 0.7, list = FALSE)
+    # training_samples <- df$corrup %>% 
+    #   createDataPartition(p = 0.7, list = FALSE)
     train_set  <- df[training_samples, ]
     test_set <- df[-training_samples, ]
     
@@ -41,10 +41,13 @@ Optim <- function(data, method_name, algorithm = "xgbTree", props_values, seed =
     model <- train(corrup ~ ., 
                    data = train_set, 
                    method = algorithm,
-                   trControl = trainControl("cv", number = 5))
+                   trControl = trainControl("cv", number = 10))
     
-    # Ajuste con test set
+    # Ajuste con train set
     y_hat <- model %>% predict(train_set)
+    
+    # Confusion matrix
+    cm <- confusionMatrix(y_hat, reference = train_set$corrup)
     
     list(method = method_name,
          prop = p,
@@ -52,10 +55,13 @@ Optim <- function(data, method_name, algorithm = "xgbTree", props_values, seed =
          recall = sensitivity(y_hat, train_set$corrup),
          specifiticy = specificity(y_hat, train_set$corrup),
          precision = precision(y_hat, train_set$corrup),
+         accuracy = round(c(cm$overall["Accuracy"]), 2),
+         balanced_accuracy = round(cm$byClass[c("Balanced Accuracy")], 2),
          F1_score = F_meas(y_hat, train_set$corrup))
   })
   # Best cutoff
-  eval$best_cutoff <- eval$prop[which(eval$prevalence == max(eval$prevalence[which(eval$F1_score == max(eval$F1_score[which(eval$recall >= eval$specifiticy)]))]))]
+  eval_cutoff <- eval %>% filter(prevalence >= 0.4 & prevalence <= 0.6)
+  eval$best_cutoff <- eval_cutoff$prop[which.max(eval$balanced_accuracy)]
   beepr::beep(sound = 2)
   return(eval)
 }
