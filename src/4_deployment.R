@@ -11,7 +11,7 @@ eg_inc <- read_fst("./data/3_final/eg_inc_all_clean.fst")
 ig_inc <- read_fst("./data/3_final/ig_inc_all_clean.fst")
 
 ## Modelos 
-model_eg_inc <- readRDS("./models/model_eg_inc.rds")
+model_eg_inc <- readRDS("./models/model_eg_rf.rds")
 
 model_ig_inc <- readRDS("./models/model_ig_inc.rds")
 
@@ -41,11 +41,12 @@ best_cutoff <- function(tipo_fin, method){
 # Egresos ----
 
 ## Incidencia
-eg_inc_corrup_hat <- model_eg_inc$model %>%
-  predict(eg_inc %>% select(everything(), -c(mun_inegi, tema, nom_ent, nom_mun, frec_corrup, frec_no_corrup, prop_corrup, starts_with("concepto"), starts_with("capitulo"), starts_with("tema"))))
+eg_inc_corrup_hat <- model_eg_inc %>%
+  predict(eg_inc %>% select(everything(), -c(mun_inegi, tema, nom_ent, nom_mun, frec_corrup, frec_no_corrup, prop_corrup, starts_with("concepto"), starts_with("capitulo"), starts_with("tema"))) %>%
+            rename("partida_generica_herramientas_y_maquinas_herramienta" = "partida_generica_herramientas_y_maquinas-herramienta"))
 
 eg_inc_predicted <- eg_inc %>%
-  mutate(across(starts_with("prop"), ~ ifelse(.x > best_cutoff("eg", "inc"), 1, 0), .names = "corrup"),
+  mutate(across(starts_with("prop"), ~ ifelse(.x > 0, 1, 0), .names = "corrup"),
          corrup = factor(corrup, levels = c(1, 0), labels = c("corrupto", "no_corrupto")),
          corrup_hat = eg_inc_corrup_hat)
 
