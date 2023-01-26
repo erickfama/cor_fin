@@ -121,3 +121,13 @@ debt_service <- efipem_clean %>%
 
 long_run_solvency <- direct_long_term_debt %>%
   left_join(debt_service, by = c("mun_inegi", "anio"))
+
+## DF de indicadores ----
+
+indicadores_fs <- cash_solvency %>%
+  select(mun_inegi, anio, starts_with("cs_")) %>%
+  left_join(budget_solvency %>% select(mun_inegi, anio, starts_with("bs_")), by = c("mun_inegi", "anio")) %>%
+  left_join(long_run_solvency %>% select(mun_inegi, anio, starts_with("lrs_")), by = c("mun_inegi", "anio"))
+
+### Escritura ----
+write_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv")

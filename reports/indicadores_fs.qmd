@@ -1,0 +1,90 @@
+---
+title: "Reporte indicadores - Financial Sustainability"
+author:
+- "Researcher: Dr. Gabriel Purón Cid"
+- "Research assistant: Erick Gabriel Fajardo Martínez"
+date: '`r format(Sys.time(), "%d %B %Y")`'
+fontsize: 12pt
+output: word_document
+editor: visual
+fig-cap-location: top
+fig-align: center
+lang: es
+---
+
+```{r, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+options(scipen = 99999)
+
+# Librerias
+library(tidyverse)
+library(kableExtra)
+
+# Lectura 
+indicadores_fs <- read_csv(here::here("./data/3_final/indicadores_fs.csv"))
+```
+
+# Cálculo de los indicadores
+
+## Cash Solvency
+
+$$
+\text{Revenue per capita} = \text{Total revenues / Population}
+$$
+
+$$
+\begin{aligned}
+\text{Total general fund revenues from own sources} &= \frac{\text{Unassigned fund}}{\text{Total general fund sources}}\\
+&= \frac{\text{impuestos + contribuciones_de_mejoras + derechos + productos + aprovechamientos}}{\text{impuestos + contribuciones_de_mejoras + derechos + productos + aprovechamientos + participaciones_federales + aportaciones_federales_y_estatales}}\\
+&= \text{cs_total_general_fund}
+\end{aligned}
+$$
+$$
+\begin[aligned]
+\frac{\text{Intergovernmental revenues}}{\text{Total revenues}} &= \frac{\text{participaciones_federales + aportaciones_federales_y_estatales}}{\text{Total revenues}} &= \text{cs_intergov_revs_total_revs}
+\end{aligned}
+$$
+
+$$
+\frac{\text{Property tax}}{\text{Total revenues}}
+$$
+
+```{r conjunto_de_datos}
+#| label: tbl-head
+#| tbl-cap: "Conjunto de datos de los indicadores"
+
+head(indicadores_fs) %>%
+  kable() %>%
+  kable_styling(position = "center", latex_options = c("HOLD_position", "scale_down"))
+```
+
+
+```{r EDA}
+# Cantidad de NAs por indicador
+indicadores_fs %>%
+  select(-mun_inegi) %>%
+  group_by(anio) %>%
+  summarise(across(everything(), ~ sum(is.na(.x)))) %>%
+  pivot_longer(names_to = "indicador", values_to = "NA_count", cols = -c(anio)) %>%
+  ggplot(aes(NA_count, indicador)) +
+  geom_col(width = 0.1) +
+  geom_point() + 
+  facet_wrap(~anio) +
+  labs(title = "Cantidad de valores faltantes por indicador y año") +
+  theme_bw()
+```
+
+```{r descriptive}
+#| label: tbl-desc
+#| tbl-cap: Estadística descriptiva de los indicadores
+indicadores_fs %>%
+  select(-mun_inegi) %>%
+  pivot_longer(names_to = "indicador", values_to = "valor", cols = -anio) %>%
+  group_by(anio, indicador) %>%
+  summarise(min = min(valor, na.rm = TRUE),  
+            media = mean(valor, na.rm = TRUE),
+            max = max(valor, na.rm = TRUE),
+            sd = sd(valor, na.rm = TRUE)) %>%
+  kable() %>%
+  kable_styling(position = "center", latex_options = c("HOLD_position", "scale_down"))
+```
