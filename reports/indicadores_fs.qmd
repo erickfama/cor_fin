@@ -54,36 +54,89 @@ $$
 - `cs_propety_tax_total_revs`
 
 $$
-\frac{\text{Property tax}}{\text{Total revenues}}
+\frac{\text{Property tax}}{\text{Total revenues}} = \frac{\text{impuestos sobre el patrimonio}}{\text{Ingresos totales}}
 $$
+
+## Budget Solvency
+
+- `bs_operating_exp`
+
+$$
+\frac{\text{Operating expenditures}}{\text{Total expenditures}} = \frac{\text{servicios personales + materiales y suministros + servicios generales}}{\text{Gastos totales}}
+$$
+
+- `bs_operating_balance`
+
+$$
+\text{Operating balance} = \frac{\text{Total revenues}}{\text{Total expenditures}} 
+$$
+
+## Long-run Solvency
+
+- `lrs_direct_long_term_debt_pobtot`
+
+$$
+\frac{\text{Direct long term debt}}{\text{Population}} = \frac{\text{Financiamiento}}{\text{Población}}
+$$
+
+- `lrs_debt_service_total_rev`
+
+$$
+\frac{\text{Debt service}}{\text{Total revenues}} = \frac{\text{Deuda pública}}{\text{Ingresos totales}}
+$$
+
+|
+|
+|
+|
 
 ```{r conjunto_de_datos}
 #| label: tbl-head
 #| tbl-cap: "Conjunto de datos de los indicadores"
+#| #| layout: "[[1], [-1], [1]]"
 
 head(indicadores_fs) %>%
-  kable() %>%
+  kable(col.names = c("Municipio INEGI", "Año", names(indicadores_fs)[3:11])) %>%
   kable_styling(position = "center", latex_options = c("HOLD_position", "scale_down"))
 ```
 
+|
+|
+|
+|
+
 ```{r EDA}
+#| label: fig-na
+#| fig-cap: Cantidad de valores daltantes por indicador y año
+#| fig-cap-location: top
+#| layout: "[[1], [-1], [1]]"
+
 # Cantidad de NAs por indicador
 indicadores_fs %>%
   select(-mun_inegi) %>%
   group_by(anio) %>%
   summarise(across(everything(), ~ sum(is.na(.x)))) %>%
   pivot_longer(names_to = "indicador", values_to = "NA_count", cols = -c(anio)) %>%
-  ggplot(aes(NA_count, indicador)) +
-  geom_col(width = 0.1) +
+  mutate(fs_class = str_extract(indicador, "^[a-z]+")) %>%
+  ggplot(aes(NA_count, indicador, col = fs_class)) +
+  geom_col(width = 0.1, show.legend = FALSE) +
   geom_point() + 
+  scale_color_discrete(name = "Clase indicador") +
   facet_wrap(~anio) +
-  labs(title = "Cantidad de valores faltantes por indicador y año") +
+  labs(
+       x = "Valores faltantes") +
   theme_bw()
 ```
+
+|
+|
+|
+|
 
 ```{r descriptive}
 #| label: tbl-desc
 #| tbl-cap: Estadística descriptiva de los indicadores
+#| layout: "[[1], [-1], [1]]"
 indicadores_fs %>%
   select(-mun_inegi) %>%
   pivot_longer(names_to = "indicador", values_to = "valor", cols = -anio) %>%
@@ -92,6 +145,6 @@ indicadores_fs %>%
             media = mean(valor, na.rm = TRUE),
             max = max(valor, na.rm = TRUE),
             sd = sd(valor, na.rm = TRUE)) %>%
-  kable() %>%
+  kable(col.names = c("Año", "Indicador", "Min", "Media", "Max", "Desviación Estándar")) %>%
   kable_styling(position = "center", latex_options = c("HOLD_position", "scale_down"))
 ```

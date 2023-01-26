@@ -15,11 +15,14 @@ indicadores_fs %>%
   group_by(anio) %>%
   summarise(across(everything(), ~ sum(is.na(.x)))) %>%
   pivot_longer(names_to = "indicador", values_to = "NA_count", cols = -c(anio)) %>%
-  ggplot(aes(NA_count, indicador)) +
-  geom_col(width = 0.1) +
+  mutate(fs_class = str_extract(indicador, "^[a-z]+")) %>%
+  ggplot(aes(NA_count, indicador, col = fs_class)) +
+  geom_col(width = 0.1, show.legend = FALSE) +
   geom_point() + 
+  scale_color_discrete(name = "Clase indicador") +
   facet_wrap(~anio) +
-  labs(title = "Cantidad de valores faltantes por indicador y año") +
+  labs(title = "Cantidad de valores faltantes por indicador y año",
+       x = "Valores faltantes") +
   theme_bw()
 
 # Estadística descriptiva de los indicadores
