@@ -94,7 +94,7 @@ operating_balance <- data.frame(mun_inegi = total_exp$mun_inegi,
  
 ### Total expenditures per capita ----
 expenditures_perCapita <- total_exp %>%
-  mutate(bs_expenditire_perCapita = total_exp / pobtot)
+  mutate(bs_expenditure_perCapita = total_exp / pobtot)
 
 ## Conjunto de indicadores Budget Solvency ----
 budget_solvency <- operating_exp %>% 
@@ -131,3 +131,5 @@ indicadores_fs <- cash_solvency %>%
 
 ### Escritura ----
 write_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv")
+
+rm(list = ls())

@@ -5,8 +5,7 @@ author:
 - "Research assistant: Erick Gabriel Fajardo Martínez"
 date: '`r format(Sys.time(), "%d %B %Y")`'
 fontsize: 12pt
-output: word_document
-editor: visual
+output: html
 fig-cap-location: top
 fig-align: center
 lang: es
@@ -28,22 +27,31 @@ indicadores_fs <- read_csv(here::here("./data/3_final/indicadores_fs.csv"))
 
 ## Cash Solvency
 
-$$
-\text{Revenue per capita} = \text{Total revenues / Population}
-$$
+- `cs_revenue_perCapita`
 
 $$
 \begin{aligned}
-\text{Total general fund revenues from own sources} &= \frac{\text{Unassigned fund}}{\text{Total general fund sources}}\\
-&= \frac{\text{impuestos + contribuciones_de_mejoras + derechos + productos + aprovechamientos}}{\text{impuestos + contribuciones_de_mejoras + derechos + productos + aprovechamientos + participaciones_federales + aportaciones_federales_y_estatales}}\\
-&= \text{cs_total_general_fund}
+\text{Revenue per capita} = \frac{\text{Total revenues}}{\text{Population}}
 \end{aligned}
 $$
+
+- `cs_total_general_fund`
+
 $$
-\begin[aligned]
-\frac{\text{Intergovernmental revenues}}{\text{Total revenues}} &= \frac{\text{participaciones_federales + aportaciones_federales_y_estatales}}{\text{Total revenues}} &= \text{cs_intergov_revs_total_revs}
+\begin{aligned}
+\text{Total general fund revenues from own sources} &= \frac{\text{Unassigned fund}}{\text{Total general fund sources}} = \frac{\text{impuestos + contribuciones de mejoras + derechos + productos + aprovechamientos}}{\text{impuestos + contribuciones de mejoras + derechos + productos + aprovechamientos + participaciones federales + aportaciones federales y estatales}} 
 \end{aligned}
 $$
+
+- `cs_intergov_revs_total_revs`
+
+$$
+\begin{aligned}
+\frac{\text{Intergovernmental revenues}}{\text{Total revenues}} = \frac{\text{participaciones federales + aportaciones federales y estatales}}{\text{Total revenues}}
+\end{aligned}
+$$
+
+- `cs_propety_tax_total_revs`
 
 $$
 \frac{\text{Property tax}}{\text{Total revenues}}
@@ -57,7 +65,6 @@ head(indicadores_fs) %>%
   kable() %>%
   kable_styling(position = "center", latex_options = c("HOLD_position", "scale_down"))
 ```
-
 
 ```{r EDA}
 # Cantidad de NAs por indicador
