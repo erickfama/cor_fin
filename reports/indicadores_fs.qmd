@@ -4,7 +4,7 @@ author:
 - "Researcher: Dr. Gabriel Purón Cid"
 - "Research assistant: Erick Gabriel Fajardo Martínez"
 date: '`r format(Sys.time(), "%d %B %Y")`'
-fontsize: 12pt
+fontsize: 14pt
 output: html
 fig-cap-location: top
 fig-align: center
@@ -67,6 +67,10 @@ $$
 
 - `bs_operating_balance`
 
+**Esto da como resultado 1: Quitar en financiamiento en ingresos y saldo inicial/final**
+
+**Buscar saldo inicial/final**
+
 $$
 \text{Operating balance} = \frac{\text{Total revenues}}{\text{Total expenditures}} 
 $$
@@ -74,6 +78,8 @@ $$
 ## Long-run Solvency
 
 - `lrs_direct_long_term_debt_pobtot`
+
+**Este indicador debe calcularse con los datos, reemplazar financiamiento por total de la deuda**
 
 $$
 \frac{\text{Direct long term debt}}{\text{Population}} = \frac{\text{Financiamiento}}{\text{Población}}
@@ -89,6 +95,12 @@ $$
 |
 |
 |
+
+## Service-level solvency
+
+### Gasto corriente per capita
+
+Inversion y obra publica / pob
 
 ```{r conjunto_de_datos}
 #| label: tbl-head
@@ -107,7 +119,7 @@ head(indicadores_fs) %>%
 
 ```{r EDA}
 #| label: fig-na
-#| fig-cap: Cantidad de valores daltantes por indicador y año
+#| fig-cap: Cantidad de valores faltantes por indicador y año
 #| fig-cap-location: top
 #| layout: "[[1], [-1], [1]]"
 
@@ -120,7 +132,7 @@ indicadores_fs %>%
   mutate(fs_class = str_extract(indicador, "^[a-z]+")) %>%
   ggplot(aes(NA_count, indicador, col = fs_class)) +
   geom_col(width = 0.1, show.legend = FALSE) +
-  geom_point() + 
+  geom_point(size = 2) + 
   scale_color_discrete(name = "Clase indicador") +
   facet_wrap(~anio) +
   labs(
@@ -148,3 +160,8 @@ indicadores_fs %>%
   kable(col.names = c("Año", "Indicador", "Min", "Media", "Max", "Desviación Estándar")) %>%
   kable_styling(position = "center", latex_options = c("HOLD_position", "scale_down"))
 ```
+
+0. Corregir indicadores
+1. Completar base
+2. Limpiar base
+3. Normalizar la base
