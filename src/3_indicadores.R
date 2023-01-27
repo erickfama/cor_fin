@@ -125,9 +125,15 @@ long_run_solvency <- direct_long_term_debt %>%
 ## DF de indicadores ----
 
 indicadores_fs <- cash_solvency %>%
-  select(mun_inegi, anio, starts_with("cs_")) %>%
+  select(mun_inegi, anio, pobtot, starts_with("cs_")) %>%
   left_join(budget_solvency %>% select(mun_inegi, anio, starts_with("bs_")), by = c("mun_inegi", "anio")) %>%
   left_join(long_run_solvency %>% select(mun_inegi, anio, starts_with("lrs_")), by = c("mun_inegi", "anio"))
+
+# Variables contextuales ----
+indicadores_fs <- indicadores_fs %>%
+  mutate(mun_tipo = ifelse(pobtot > 2500, "urb", "rur") # Población
+         
+         ) 
 
 ### Escritura ----
 write_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv")
