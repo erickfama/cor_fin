@@ -4,7 +4,12 @@
 library(tidyverse)
 
 # Lectura ----
+
+# La efipem solo capto 2088 municipios de los 2453 en 2021
 efipem_clean <- read_csv("./data/2_interim/efipem_clean.csv")
+censo_raw <- read_csv("./data/1_raw/conjunto_de_datos_iter_00CSV20.csv") %>%
+  janitor::clean_names()
+imm_raw <- readxl::read_xls("./data/1_raw/IMM_2020.xls", skip = 1)
 
 # Indicadores ----
 
@@ -85,12 +90,17 @@ operating_exp <- expenditure %>%
   mutate(total_exp = total_exp$total_exp, 
          bs_operating_exp = operating_exp / total_exp) 
 
-### Operating balance: total revenues / total expenditures ----
+### Operating balance: total revenues - finance / total expenditures ----
+total_revs_noFinance <- efipem_clean %>%
+  filter(tema == "ingresos" & categoria == "capitulo" & descripcion_categoria != "financiamiento") %>%
+  group_by(mun_inegi, anio) %>% 
+  summarise(total_revs_noFinance = sum(valor))
+
 operating_balance <- data.frame(mun_inegi = total_exp$mun_inegi,
                                 anio = total_exp$anio, 
-                                total_exp = total_exp$total_exp, 
-                                total_revs = total_revs$valor) %>%
-  mutate(bs_operating_balance = total_revs/total_exp) # Resulta interesante, estos registros demuestran que todos los ingresos son gastados
+                                total_exp = total_exp$total_exp) %>%
+  left_join(total_revs_noFinance, by = c("mun_inegi", "anio")) %>%
+  mutate(bs_operating_balance = total_revs_noFinance/total_exp) # Resulta interesante, estos registros demuestran que todos los ingresos son gastados
  
 ### Total expenditures per capita ----
 expenditures_perCapita <- total_exp %>%
@@ -106,7 +116,7 @@ budget_solvency <- operating_exp %>%
 ### Direct long-term debt / Population ----
 
 direct_long_term_debt <- efipem_clean %>%
-  filter(tema == "ingresos" & descripcion_categoria == "financiamiento") %>%
+  filter(tema == "ingresos" & descripcion_categoria == "deuda_publica") %>%
   mutate(lrs_direct_long_term_debt_pobtot = valor/pobtot) %>% 
   select(mun_inegi, anio, financiamiento = valor, pobtot, lrs_direct_long_term_debt_pobtot)
 
@@ -130,12 +140,94 @@ indicadores_fs <- cash_solvency %>%
   left_join(long_run_solvency %>% select(mun_inegi, anio, starts_with("lrs_")), by = c("mun_inegi", "anio"))
 
 # Variables contextuales ----
-indicadores_fs <- indicadores_fs %>%
-  mutate(mun_tipo = ifelse(pobtot > 2500, "urb", "rur") # Población
-         
-         ) 
+# indicadores_fs <- read_csv("./data/3_final/indicadores_fs.csv")
 
-### Escritura ----
-write_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv")
+## Censo 2020 ----
+censo_clean <- censo_raw %>%
+  mutate(mun_inegi = paste(entidad, mun, sep = "")) %>% 
+  filter(mun_inegi != "00000" & mun != "000", loc == "0000") %>%
+  # Tipología de municipios: https://archivos.juridicas.unam.mx/www/bjv/libros/10/4513/8.pdf
+  group_by(mun_inegi, loc) %>%
+  mutate(mun_tipo = case_when(pobtot >= 150000 ~ "metropolitano",
+                                 pobtot >= 30000 & pobtot < 150000 ~ "urbano",
+                                 pobtot >= 10000 & pobtot < 30000 ~ "transición_rural-urbano",
+                                 pobtot >= 0 & pobtot < 10000 ~ "rural")
+  ) %>%
+  ungroup() %>%
+  select(mun_inegi, mun_tipo, graproes, pea, pe_inac, pocupada, pdesocup, psinder, pder_ss)
+
+indicadores_fs <- indicadores_fs %>%
+  left_join(censo_clean, by = "mun_inegi")
+
+## Índice de marginación ----
+
+# Se elimina la columna de posiciones y las últimas dos filas porque no contienen info.
+imm_clean <- imm_raw[7:nrow(imm_raw) - 2, 1:ncol(imm_raw) - 1]
+
+# Se renombran las columnas
+names(imm_clean) <- unlist(imm_raw[2, 1:ncol(imm_raw) - 1], use.names = FALSE) %>%
+  str_to_lower() %>% str_replace("cve_mun", "mun_inegi")
+
+indicadores_fs <- indicadores_fs %>%
+  left_join(imm_clean %>% select(-c("cve_ent", "pob_tot")), by = "mun_inegi") %>%
+  select(nom_ent, nom_mun, everything())
+
+# Diccionarios ----
+
+## Indicadores efipem ----
+efipem_dicc <- data.frame(
+  mnemonico = indicadores_fs %>%
+  select(starts_with(c("cs_", "bs_", "lrs_"))) %>%
+  names(.)
+  ) %>%
+    mutate(indicador = c("Cash solvency: revenue per capita", 
+                         "Cash solvency: total general fund revenues from own sources",
+                         "Cash solvency: intergovernmental revenues divided by total revenues",
+                         "Cash solvency: property tax divided by total revenues",
+                       "Budget solvency: operating expenditures divided by total expenditures",
+                       "Budget solvency: operating balance = total revenues divided by total expenditures",
+                       "Budget solvency: total expenditures divided by population",
+                       "Long run solvency: direct long term debt divided by population",
+                       "Long run solvency: debt service divided by total revenues"),
+         fuente = "INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021") %>%
+  select(fuente, mnemonico, indicador)
+
+## Censo 2020 ----
+censo_dicc <- read_csv("./data/1_raw/diccionario_datos_iter_00CSV20.csv", skip = 3) %>%
+  janitor::clean_names() %>%
+  mutate(mnemonico = str_to_lower(mnemonico),
+         fuente = "INEGI: censo población y vivienda 2020") %>%
+  filter(mnemonico %in% names(censo_clean)) %>%
+  select(fuente, mnemonico, indicador) %>%
+  bind_rows(c("fuente" = "INEGI: censo población y vivienda 2020", "mnemonico" = "mun_inegi", "indicador" = "Clave única del municipio"))
+
+## Indice de marginacion ----
+imm_dicc <- imm_raw %>%
+  slice(2) %>%
+  select(-18) %>%
+  pivot_longer(everything(), names_to = "indicador", values_to = "mnemonico") %>%
+  mutate(fuente = "CONAPO: índice de marginación 2020",
+         mnemonico = str_to_lower(mnemonico)) %>%
+  select(fuente, mnemonico, indicador)
+
+# Diccionario completo
+dicc <- efipem_dicc %>%
+  bind_rows(censo_dicc, imm_dicc)
+
+indicadores_dicc <- data.frame(mnemonico = names(indicadores_fs)) %>%
+  left_join(dicc, by = "mnemonico") %>%
+  select(fuente, mnemonico, indicador) %>%
+  mutate(fuente = case_when(mnemonico == "anio" ~ "INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021",
+                            mnemonico == "mun_tipo" ~ "Elaboración propia con base en: https://archivos.juridicas.unam.mx/www/bjv/libros/10/4513/8.pdf",
+                            mnemonico == "pobtot" ~ "INEGI: censo población y vivienda 2020",
+                            TRUE ~ fuente),
+         indicador = case_when(mnemonico == "anio" ~ "Año de levantamiento de información sobre la estadística de las finanzas públicas estatales y municipales",
+                               mnemonico == "mun_tipo" ~ "Tipo de municipio: Metropolitano > 150000 hab; Urbano >= 30000 y < 150000 hab; En transición de rural a urbano >= 10000 y < 30000 hab; Rural < 10000 hab",
+                               mnemonico == "pobtot" ~ "Población total del municipio",
+                               TRUE ~ indicador)) 
+
+# Escritura ----
+write_excel_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv", )
+write_excel_csv(indicadores_dicc, "./data/3_final/indicadores_dicc.csv")
 
 rm(list = ls())

@@ -72,7 +72,13 @@ $$
 **Buscar saldo inicial/final**
 
 $$
-\text{Operating balance} = \frac{\text{Total revenues}}{\text{Total expenditures}} 
+\text{Operating balance} = \frac{\text{Total revenues - Financing}}{\text{Total expenditures}} 
+$$
+
+- `bs_expenditure_perCapita`
+
+$$
+\text{Expenditure per captita} = \frac{\text{Total expenditures}}{\text{Population}}
 $$
 
 ## Long-run Solvency
@@ -82,7 +88,7 @@ $$
 **Este indicador debe calcularse con los datos, reemplazar financiamiento por total de la deuda**
 
 $$
-\frac{\text{Direct long term debt}}{\text{Population}} = \frac{\text{Financiamiento}}{\text{Población}}
+\frac{\text{Direct long term debt}}{\text{Population}} = \frac{\text{Deuda pública}}{\text{Población}}
 $$
 
 - `lrs_debt_service_total_rev`
