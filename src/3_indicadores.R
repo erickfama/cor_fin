@@ -116,7 +116,7 @@ budget_solvency <- operating_exp %>%
 ### Direct long-term debt / Population ----
 
 direct_long_term_debt <- efipem_clean %>%
-  filter(tema == "ingresos" & descripcion_categoria == "deuda_publica") %>%
+  filter(tema == "egresos" & descripcion_categoria == "deuda_publica") %>%
   mutate(lrs_direct_long_term_debt_pobtot = valor/pobtot) %>% 
   select(mun_inegi, anio, financiamiento = valor, pobtot, lrs_direct_long_term_debt_pobtot)
 
@@ -172,6 +172,22 @@ indicadores_fs <- indicadores_fs %>%
   left_join(imm_clean %>% select(-c("cve_ent", "pob_tot")), by = "mun_inegi") %>%
   select(nom_ent, nom_mun, everything())
 
+## Efipem ----
+efipem_clean_cap <- efipem_clean %>%
+  filter(categoria %in% c("tema", "capitulo")) %>%
+  select(mun_inegi, anio, tema, descripcion_categoria, valor) %>%
+  unite(descripcion_categoria, tema:descripcion_categoria, sep = "_") %>%
+  pivot_wider(names_from = descripcion_categoria,
+              values_from = valor)
+
+indicadores_fs <- indicadores_fs %>%
+  left_join(efipem_clean_cap, by = c("mun_inegi", "anio"))
+
+# Redondeo de valores muy grandes
+indicadores_fs <- indicadores_fs %>%
+  mutate(across(c(graproes:im_2020, imn_2020), ~ as.numeric(.x))) %>%
+  mutate(across(where(is.numeric), ~ round(.x, 6)))
+
 # Diccionarios ----
 
 ## Indicadores efipem ----
@@ -210,7 +226,7 @@ imm_dicc <- imm_raw %>%
          mnemonico = str_to_lower(mnemonico)) %>%
   select(fuente, mnemonico, indicador)
 
-# Diccionario completo
+## Diccionario completo ----
 dicc <- efipem_dicc %>%
   bind_rows(censo_dicc, imm_dicc)
 
@@ -227,7 +243,7 @@ indicadores_dicc <- data.frame(mnemonico = names(indicadores_fs)) %>%
                                TRUE ~ indicador)) 
 
 # Escritura ----
-write_excel_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv", )
+write_excel_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv")
 write_excel_csv(indicadores_dicc, "./data/3_final/indicadores_dicc.csv")
 
 rm(list = ls())
