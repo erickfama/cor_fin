@@ -183,6 +183,18 @@ efipem_clean_cap <- efipem_clean %>%
 indicadores_fs <- indicadores_fs %>%
   left_join(efipem_clean_cap, by = c("mun_inegi", "anio"))
 
+## Encig ----
+
+# Percepción
+encig17_per_clean <- read_csv("./data/2_interim/encig17_per_clean.csv")
+encig19_per_clean <- read_csv("./data/2_interim/encig19_per_clean.csv")
+encig21_per_clean <- read_csv("./data/2_interim/encig21_per_clean.csv")
+
+# Incidencia
+encig17_inc_clean <- read_csv("./data/2_interim/encig17_inc_clean.csv")
+encig19_inc_clean <- read_csv("./data/2_interim/encig19_inc_clean.csv")
+encig21_inc_clean <- read_csv("./data/2_interim/encig21_inc_clean.csv")
+
 # Redondeo de valores muy grandes
 indicadores_fs <- indicadores_fs %>%
   mutate(across(c(graproes:im_2020, imn_2020), ~ as.numeric(.x))) %>%
