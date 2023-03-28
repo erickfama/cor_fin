@@ -188,6 +188,19 @@ indicadores_fs <- indicadores_fs %>%
   mutate(across(c(graproes:im_2020, imn_2020), ~ as.numeric(.x))) %>%
   mutate(across(where(is.numeric), ~ round(.x, 6)))
 
+## Encig 17-21 Corrupcion ----
+encig17 <- read_csv("./data/2_interim/encig17_clean.csv") %>%
+  select(-starts_with("nom"))
+encig19 <- read_csv("./data/2_interim/encig19_clean.csv")%>%
+  select(-starts_with("nom"))
+encig21 <- read_csv("./data/2_interim/encig21_clean.csv")%>%
+  select(-starts_with("nom"))
+
+indicadores_fs <- indicadores_fs %>%
+  left_join(encig17, by = c("mun_inegi", "anio")) %>%
+  left_join(encig19, by = c("mun_inegi", "anio")) %>%
+  left_join(encig21, by = c("mun_inegi", "anio"))
+
 # Diccionarios ----
 
 ## Indicadores efipem ----
@@ -226,9 +239,26 @@ imm_dicc <- imm_raw %>%
          mnemonico = str_to_lower(mnemonico)) %>%
   select(fuente, mnemonico, indicador)
 
+## Encig ----
+encig_dicc <- data.frame(mnemonico = unlist(lapply(list(encig17 %>% select(starts_with("prop")), 
+                                                 encig19 %>% select(starts_with("prop")), 
+                                                 encig21 %>% select(starts_with("prop"))),
+                                            names))) %>%
+  mutate(fuente = c(rep("INEGI: ENCIG 2017", 3), rep("INEGI: ENCIG 2019", 3), rep("INEGI: ENCIG 2021", 3)), 
+         indicador = case_when(mnemonico == "prop_corrup_per17" ~ "Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2017",
+                               mnemonico == "prop_corrup_inc17" ~ "Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2017 con base en datos de la ENCIG 2017",
+                               mnemonico == "prop_corrup5_inc17" ~"Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2017",
+                               mnemonico == "prop_corrup_per19" ~ "Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2019",
+                               mnemonico == "prop_corrup_inc19" ~ "Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2019 con base en datos de la ENCIG 2019",
+                               mnemonico == "prop_corrup5_inc19" ~"Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2019",
+                               mnemonico == "prop_corrup_per21" ~ "Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2021",
+                               mnemonico == "prop_corrup_inc21" ~ "Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2021 con base en datos de la ENCIG 2021",
+                               mnemonico == "prop_corrup5_inc21" ~"Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2021")) %>%
+  select(fuente, mnemonico, indicador)
+
 ## Diccionario completo ----
 dicc <- efipem_dicc %>%
-  bind_rows(censo_dicc, imm_dicc)
+  bind_rows(censo_dicc, imm_dicc, encig_dicc)
 
 indicadores_dicc <- data.frame(mnemonico = names(indicadores_fs)) %>%
   left_join(dicc, by = "mnemonico") %>%
@@ -236,11 +266,12 @@ indicadores_dicc <- data.frame(mnemonico = names(indicadores_fs)) %>%
   mutate(fuente = case_when(mnemonico == "anio" ~ "INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021",
                             mnemonico == "mun_tipo" ~ "Elaboración propia con base en: https://archivos.juridicas.unam.mx/www/bjv/libros/10/4513/8.pdf",
                             mnemonico == "pobtot" ~ "INEGI: censo población y vivienda 2020",
+                            is.na(fuente) == TRUE ~ "INEGI: Finanzas Públicas Estatales y Municipales",
                             TRUE ~ fuente),
          indicador = case_when(mnemonico == "anio" ~ "Año de levantamiento de información sobre la estadística de las finanzas públicas estatales y municipales",
                                mnemonico == "mun_tipo" ~ "Tipo de municipio: Metropolitano > 150000 hab; Urbano >= 30000 y < 150000 hab; En transición de rural a urbano >= 10000 y < 30000 hab; Rural < 10000 hab",
                                mnemonico == "pobtot" ~ "Población total del municipio",
-                               TRUE ~ indicador)) 
+                               TRUE ~ indicador))
 
 # Escritura ----
 write_excel_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv")

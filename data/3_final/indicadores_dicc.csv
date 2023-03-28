@@ -33,3 +33,34 @@
 "CONAPO: índice de marginación 2020","im_2020","Índice de marginación, 2020"
 "CONAPO: índice de marginación 2020","gm_2020","Grado de marginación, 2020"
 "CONAPO: índice de marginación 2020","imn_2020","Índice de marginación normalizado, 2020"
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_total_de_egresos",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_servicios_personales",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_materiales_y_suministros",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_servicios_generales",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_transferencias_asignaciones_subsidios_y_otras_ayudas",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_bienes_muebles_inmuebles_e_intangibles",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_inversion_publica",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_deuda_publica",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_total_de_ingresos",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_impuestos",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_contribuciones_de_mejoras",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_derechos",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_productos",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_aprovechamientos",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_participaciones_federales",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_aportaciones_federales_y_estatales",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_financiamiento",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_disponibilidad_final",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_otros_egresos",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_otros_ingresos",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_disponibilidad_inicial",NA
+"INEGI: Finanzas Públicas Estatales y Municipales","egresos_inversiones_financieras_y_otras_provisiones",NA
+"INEGI: ENCIG 2017","prop_corrup_per17","Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2017"
+"INEGI: ENCIG 2017","prop_corrup_inc17","Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2017 con base en datos de la ENCIG 2017"
+"INEGI: ENCIG 2017","prop_corrup5_inc17","Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2017"
+"INEGI: ENCIG 2019","prop_corrup_per19","Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2019"
+"INEGI: ENCIG 2019","prop_corrup_inc19","Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2019 con base en datos de la ENCIG 2019"
+"INEGI: ENCIG 2019","prop_corrup5_inc19","Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2019"
+"INEGI: ENCIG 2021","prop_corrup_per21","Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2021"
+"INEGI: ENCIG 2021","prop_corrup_inc21","Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2021 con base en datos de la ENCIG 2021"
+"INEGI: ENCIG 2021","prop_corrup5_inc21","Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2021"
