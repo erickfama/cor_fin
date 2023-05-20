@@ -25,7 +25,7 @@ revenue_perCapita <- efipem_clean %>%
 total_general_fund_rev_own <- efipem_clean %>%
   filter(tema == "ingresos" & categoria == "capitulo" & descripcion_categoria %in% c("impuestos", "contribuciones_de_mejoras", "derechos", "productos", "aprovechamientos")) %>%
   group_by(mun_inegi, anio) %>%
-  summarise(total_general_fund_rev_own = sum(valor))
+  summarise(total_general_fund_rev_own = sum(valor, na.rm = TRUE))
 
 total_general_fund_rev <- efipem_clean %>%
   filter(tema == "ingresos" & categoria == "capitulo" & descripcion_categoria %in% c("impuestos", "contribuciones_de_mejoras", "derechos", "productos", "aprovechamientos", "participaciones_federales", "aportaciones_federales_y_estatales")) %>%
@@ -50,12 +50,12 @@ intergovernmental_revs <- efipem_clean %>%
 
 ### Property tax / Total revenue ----
 property_tax <- efipem_clean %>%
-  filter(tema == "ingresos" & categoria %in% c("capitulo", "concepto") & descripcion_categoria %in% c("impuestos_sobre_el_patrimonio")) %>%
+  filter(tema == "ingresos" & categoria == "concepto" & descripcion_categoria %in% c("impuestos_sobre_el_patrimonio")) %>%
   group_by(mun_inegi, anio) %>%
   summarise(property_tax = valor) %>%
   ungroup() %>%
   left_join(total_revs %>% select(mun_inegi, anio, valor), by = c("mun_inegi", "anio")) %>%
-  mutate(cs_propety_tax_total_revs = property_tax / valor)
+  mutate(cs_propety_tax_total_revs = property_tax / valor) # Aqui resultan 1706 NAs porque hay 1706 municipios que no cuentan con datos de impuestos sobre el patrimonio en los 4 anios
 
 ### General fund balance / Total government expenditures ----
 
@@ -178,7 +178,8 @@ efipem_clean_cap <- efipem_clean %>%
   select(mun_inegi, anio, tema, descripcion_categoria, valor) %>%
   unite(descripcion_categoria, tema:descripcion_categoria, sep = "_") %>%
   pivot_wider(names_from = descripcion_categoria,
-              values_from = valor)
+              values_from = valor) %>%
+  mutate(across(everything(), ~ ifelse(is.na(.x), 0, .x)))
 
 indicadores_fs <- indicadores_fs %>%
   left_join(efipem_clean_cap, by = c("mun_inegi", "anio"))
@@ -187,6 +188,7 @@ indicadores_fs <- indicadores_fs %>%
 indicadores_fs <- indicadores_fs %>%
   mutate(across(c(graproes:im_2020, imn_2020), ~ as.numeric(.x))) %>%
   mutate(across(where(is.numeric), ~ round(.x, 6)))
+
 
 ## Encig 17-21 Corrupcion ----
 encig17 <- read_csv("./data/2_interim/encig17_clean.csv") %>%
@@ -275,6 +277,15 @@ indicadores_dicc <- data.frame(mnemonico = names(indicadores_fs)) %>%
 
 # Escritura ----
 write_excel_csv(indicadores_fs, "./data/3_final/indicadores_fs.csv")
-write_excel_csv(indicadores_dicc, "./data/3_final/indicadores_dicc.csv")
+#write_excel_csv(indicadores_dicc, "./data/3_final/indicadores_dicc.csv")
+
+NA_count <- function(df){
+  df %>%
+    summarise(across(everything(), ~ sum(is.na(.x)))) %>%
+    pivot_longer(cols = everything(), names_to = "Variables", values_to = "NAs") %>%
+    print(n = nrow(.))
+}
+
+NA_count(indicadores_fs)
 
 rm(list = ls())

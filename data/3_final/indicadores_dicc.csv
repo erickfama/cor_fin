@@ -1,66 +1,66 @@
-﻿"fuente","mnemonico","indicador"
-"CONAPO: índice de marginación 2020","nom_ent","Nombre de la entidad"
-"CONAPO: índice de marginación 2020","nom_mun","Nombre del municipio"
-"INEGI: censo población y vivienda 2020","mun_inegi","Clave única del municipio"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","anio","Año de levantamiento de información sobre la estadística de las finanzas públicas estatales y municipales"
-"INEGI: censo población y vivienda 2020","pobtot","Población total del municipio"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","cs_revenue_perCapita","Cash solvency: revenue per capita"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","cs_total_general_fund","Cash solvency: total general fund revenues from own sources"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","cs_intergov_revs_total_revs","Cash solvency: intergovernmental revenues divided by total revenues"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","cs_propety_tax_total_revs","Cash solvency: property tax divided by total revenues"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","bs_operating_exp","Budget solvency: operating expenditures divided by total expenditures"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","bs_operating_balance","Budget solvency: operating balance = total revenues divided by total expenditures"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","bs_expenditure_perCapita","Budget solvency: total expenditures divided by population"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","lrs_direct_long_term_debt_pobtot","Long run solvency: direct long term debt divided by population"
-"INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021","lrs_debt_service_total_rev","Long run solvency: debt service divided by total revenues"
-"Elaboración propia con base en: https://archivos.juridicas.unam.mx/www/bjv/libros/10/4513/8.pdf","mun_tipo","Tipo de municipio: Metropolitano > 150000 hab; Urbano >= 30000 y < 150000 hab; En transición de rural a urbano >= 10000 y < 30000 hab; Rural < 10000 hab"
-"INEGI: censo población y vivienda 2020","graproes","Grado promedio de escolaridad"
-"INEGI: censo población y vivienda 2020","pea","Población de 12 años y más económicamente activa"
-"INEGI: censo población y vivienda 2020","pe_inac","Población de 12 años y más no económicamente activa"
-"INEGI: censo población y vivienda 2020","pocupada","Población de 12 años y más ocupada"
-"INEGI: censo población y vivienda 2020","pdesocup","Población de 12 años y más desocupada"
-"INEGI: censo población y vivienda 2020","psinder","Población sin afiliación a servicios de salud"
-"INEGI: censo población y vivienda 2020","pder_ss","Población afiliada a servicios de salud"
-"CONAPO: índice de marginación 2020","analf","% Población de 15 años o más analfabeta"
-"CONAPO: índice de marginación 2020","sbasc","% Población  de 15 años o más sin educación básica"
-"CONAPO: índice de marginación 2020","ovsde","% Ocupantes en viviendas particulares sin drenaje ni excusado"
-"CONAPO: índice de marginación 2020","ovsee","% Ocupantes en viviendas particulares sin energía eléctrica"
-"CONAPO: índice de marginación 2020","ovsae","% Ocupantes en viviendas particulares sin agua entubada"
-"CONAPO: índice de marginación 2020","ovpt","% Ocupantes en viviendas particulares con piso de tierra"
-"CONAPO: índice de marginación 2020","vhac","% Viviendas particulares con hacinamiento"
-"CONAPO: índice de marginación 2020","pl.5000","% Población en localidades con menos de 5 000 habitantes"
-"CONAPO: índice de marginación 2020","po2sm","% Población ocupada con ingresos menores a 2 salarios mínimos"
-"CONAPO: índice de marginación 2020","im_2020","Índice de marginación, 2020"
-"CONAPO: índice de marginación 2020","gm_2020","Grado de marginación, 2020"
-"CONAPO: índice de marginación 2020","imn_2020","Índice de marginación normalizado, 2020"
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_total_de_egresos",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_servicios_personales",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_materiales_y_suministros",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_servicios_generales",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_transferencias_asignaciones_subsidios_y_otras_ayudas",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_bienes_muebles_inmuebles_e_intangibles",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_inversion_publica",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_deuda_publica",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_total_de_ingresos",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_impuestos",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_contribuciones_de_mejoras",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_derechos",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_productos",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_aprovechamientos",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_participaciones_federales",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_aportaciones_federales_y_estatales",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_financiamiento",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_disponibilidad_final",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_otros_egresos",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_otros_ingresos",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","ingresos_disponibilidad_inicial",NA
-"INEGI: Finanzas Públicas Estatales y Municipales","egresos_inversiones_financieras_y_otras_provisiones",NA
-"INEGI: ENCIG 2017","prop_corrup_per17","Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2017"
-"INEGI: ENCIG 2017","prop_corrup_inc17","Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2017 con base en datos de la ENCIG 2017"
-"INEGI: ENCIG 2017","prop_corrup5_inc17","Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2017"
-"INEGI: ENCIG 2019","prop_corrup_per19","Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2019"
-"INEGI: ENCIG 2019","prop_corrup_inc19","Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2019 con base en datos de la ENCIG 2019"
-"INEGI: ENCIG 2019","prop_corrup5_inc19","Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2019"
-"INEGI: ENCIG 2021","prop_corrup_per21","Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2021"
-"INEGI: ENCIG 2021","prop_corrup_inc21","Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2021 con base en datos de la ENCIG 2021"
-"INEGI: ENCIG 2021","prop_corrup5_inc21","Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2021"
+﻿fuente,mnemonico,indicador,nota
+CONAPO: índice de marginación 2020,nom_ent,Nombre de la entidad,
+CONAPO: índice de marginación 2020,nom_mun,Nombre del municipio,
+INEGI: censo población y vivienda 2020,mun_inegi,Clave única del municipio,
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,anio,Año de levantamiento de información sobre la estadística de las finanzas públicas estatales y municipales,
+INEGI: censo población y vivienda 2020,pobtot,Población total del municipio,
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,cs_revenue_perCapita,Cash solvency: revenue per capita,
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,cs_total_general_fund,Cash solvency: total general fund revenues from own sources,Existen 36 NAs debido a que algunos municipios no cuentan con datos de participaciones federales y aportaciones estatales y federales.
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,cs_intergov_revs_total_revs,Cash solvency: intergovernmental revenues divided by total revenues,
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,cs_propety_tax_total_revs,Cash solvency: property tax divided by total revenues,Existen 1706 NAs debido a que algunos municipios no cuentan con datos de impuestos sobre patrimonios
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,bs_operating_exp,Budget solvency: operating expenditures divided by total expenditures,
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,bs_operating_balance,Budget solvency: operating balance = total revenues divided by total expenditures,
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,bs_expenditure_perCapita,Budget solvency: total expenditures divided by population,
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,lrs_direct_long_term_debt_pobtot,Long run solvency: direct long term debt divided by population,Existen 4801 Nas debido a que algunos municipios no cuentan con datos sobre deuda pública
+INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,lrs_debt_service_total_rev,Long run solvency: debt service divided by total revenues,Existen 4801 Nas debido a que algunos municipios no cuentan con datos sobre deuda pública
+Elaboración propia con base en: https://archivos.juridicas.unam.mx/www/bjv/libros/10/4513/8.pdf,mun_tipo,Tipo de municipio: Metropolitano > 150000 hab; Urbano >= 30000 y < 150000 hab; En transición de rural a urbano >= 10000 y < 30000 hab; Rural < 10000 hab,
+INEGI: censo población y vivienda 2020,graproes,Grado promedio de escolaridad,
+INEGI: censo población y vivienda 2020,pea,Población de 12 años y más económicamente activa,
+INEGI: censo población y vivienda 2020,pe_inac,Población de 12 años y más no económicamente activa,
+INEGI: censo población y vivienda 2020,pocupada,Población de 12 años y más ocupada,
+INEGI: censo población y vivienda 2020,pdesocup,Población de 12 años y más desocupada,
+INEGI: censo población y vivienda 2020,psinder,Población sin afiliación a servicios de salud,
+INEGI: censo población y vivienda 2020,pder_ss,Población afiliada a servicios de salud,
+CONAPO: índice de marginación 2020,analf,% Población de 15 años o más analfabeta,
+CONAPO: índice de marginación 2020,sbasc,% Población  de 15 años o más sin educación básica,
+CONAPO: índice de marginación 2020,ovsde,% Ocupantes en viviendas particulares sin drenaje ni excusado,
+CONAPO: índice de marginación 2020,ovsee,% Ocupantes en viviendas particulares sin energía eléctrica,
+CONAPO: índice de marginación 2020,ovsae,% Ocupantes en viviendas particulares sin agua entubada,
+CONAPO: índice de marginación 2020,ovpt,% Ocupantes en viviendas particulares con piso de tierra,
+CONAPO: índice de marginación 2020,vhac,% Viviendas particulares con hacinamiento,
+CONAPO: índice de marginación 2020,pl.5000,% Población en localidades con menos de 5 000 habitantes,
+CONAPO: índice de marginación 2020,po2sm,% Población ocupada con ingresos menores a 2 salarios mínimos,
+CONAPO: índice de marginación 2020,im_2020,"Índice de marginación, 2020",
+CONAPO: índice de marginación 2020,gm_2020,"Grado de marginación, 2020",
+CONAPO: índice de marginación 2020,imn_2020,"Índice de marginación normalizado, 2020",
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_total_de_egresos,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_servicios_personales,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_materiales_y_suministros,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_servicios_generales,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_transferencias_asignaciones_subsidios_y_otras_ayudas,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_bienes_muebles_inmuebles_e_intangibles,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_inversion_publica,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_deuda_publica,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_total_de_ingresos,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_impuestos,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_contribuciones_de_mejoras,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_derechos,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_productos,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_aprovechamientos,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_participaciones_federales,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_aportaciones_federales_y_estatales,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_financiamiento,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_disponibilidad_final,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_otros_egresos,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_otros_ingresos,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,ingresos_disponibilidad_inicial,NA,
+INEGI: Finanzas Públicas Estatales y Municipales,egresos_inversiones_financieras_y_otras_provisiones,NA,
+INEGI: ENCIG 2017,prop_corrup_per17,Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2017,Existen 8267 NAs debido a que la ENCIG 2017 solo captura información de 246 municipios
+INEGI: ENCIG 2017,prop_corrup_inc17,Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2017 con base en datos de la ENCIG 2017,Existen 8267 NAs debido a que la ENCIG 2017 solo captura información de 246 municipios
+INEGI: ENCIG 2017,prop_corrup5_inc17,Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2017,Existen 8267 NAs debido a que la ENCIG 2017 solo captura información de 246 municipios
+INEGI: ENCIG 2019,prop_corrup_per19,Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2019,Existen 8257 NAs debido a que la ENCIG 2019 solo captura información de 255 municipios
+INEGI: ENCIG 2019,prop_corrup_inc19,Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2019 con base en datos de la ENCIG 2019,Existen 8257 NAs debido a que la ENCIG 2019 solo captura información de 255 municipios
+INEGI: ENCIG 2019,prop_corrup5_inc19,Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2019,Existen 8257 NAs debido a que la ENCIG 2019 solo captura información de 255 municipios
+INEGI: ENCIG 2021,prop_corrup_per21,Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2021,Existen 8271 NAs debido a que la ENCIG 2021 solo captura información de 255 municipios
+INEGI: ENCIG 2021,prop_corrup_inc21,Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2021 con base en datos de la ENCIG 2021,Existen 8271 NAs debido a que la ENCIG 2021 solo captura información para 255 municipios
+INEGI: ENCIG 2021,prop_corrup5_inc21,Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2021,Existen 8271 NAs debido a que la ENCIG 2021 solo captura información para 255 municipios
