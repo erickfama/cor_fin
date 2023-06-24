@@ -3,7 +3,8 @@ CONAPO: índice de marginación 2020,nom_ent,Nombre de la entidad,
 CONAPO: índice de marginación 2020,nom_mun,Nombre del municipio,
 INEGI: censo población y vivienda 2020,mun_inegi,Clave única del municipio,
 INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,anio,Año de levantamiento de información sobre la estadística de las finanzas públicas estatales y municipales,
-INEGI: censo población y vivienda 2020,pobtot,Población total del municipio,
+INEGI: censo población y vivienda 2020,pobtot_mun,Población total del municipio,
+INEGI: censo población y vivienda 2020,pobtot_edo,Población total del estado (suma de la población de los municipios),
 INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,cs_revenue_perCapita,Cash solvency: revenue per capita,
 INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,cs_total_general_fund,Cash solvency: total general fund revenues from own sources,Existen 36 NAs debido a que algunos municipios no cuentan con datos de participaciones federales y aportaciones estatales y federales.
 INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,cs_intergov_revs_total_revs,Cash solvency: intergovernmental revenues divided by total revenues,
@@ -14,7 +15,8 @@ INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,bs
 INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,lrs_direct_long_term_debt_pobtot,Long run solvency: direct long term debt divided by population,Existen 4801 Nas debido a que algunos municipios no cuentan con datos sobre deuda pública
 INEGI: estadística de finanzas públicas estatales y municipales 2018 - 2021,lrs_debt_service_total_rev,Long run solvency: debt service divided by total revenues,Existen 4801 Nas debido a que algunos municipios no cuentan con datos sobre deuda pública
 Elaboración propia con base en: https://archivos.juridicas.unam.mx/www/bjv/libros/10/4513/8.pdf,mun_tipo,Tipo de municipio: Metropolitano > 150000 hab; Urbano >= 30000 y < 150000 hab; En transición de rural a urbano >= 10000 y < 30000 hab; Rural < 10000 hab,
-INEGI: censo población y vivienda 2020,graproes,Grado promedio de escolaridad,
+INEGI: censo población y vivienda 2020,graproes_mun,Grado promedio de escolaridad del municipio,
+INEGI: censo población y vivienda 2020,graproes_edo,Grado promedio de escolaridad promedio del estado,
 INEGI: censo población y vivienda 2020,pea,Población de 12 años y más económicamente activa,
 INEGI: censo población y vivienda 2020,pe_inac,Población de 12 años y más no económicamente activa,
 INEGI: censo población y vivienda 2020,pocupada,Población de 12 años y más ocupada,
@@ -64,3 +66,5 @@ INEGI: ENCIG 2019,prop_corrup5_inc19,Proporción de la población del municipio 
 INEGI: ENCIG 2021,prop_corrup_per21,Proporción de la población del municipio que reporta percibir el fenómeno de la corrupción como 'muy frecuente' con base en datos de la ENCIG 2021,Existen 8271 NAs debido a que la ENCIG 2021 solo captura información de 255 municipios
 INEGI: ENCIG 2021,prop_corrup_inc21,Proporción de la población del municipio que reporta haber experimentado actos de corrupción durante el año 2021 con base en datos de la ENCIG 2021,Existen 8271 NAs debido a que la ENCIG 2021 solo captura información para 255 municipios
 INEGI: ENCIG 2021,prop_corrup5_inc21,Proporción de la población del municipio que reporta haber experimentado actos de corrupción en los últimos 5 años con base en datos de la ENCIG 2021,Existen 8271 NAs debido a que la ENCIG 2021 solo captura información para 255 municipios
+INEGI: PIB por Entidad Federativa (PIBE),pib_edo,PIB por entidad federativa. Valores constantes (año base 2023) en millones de pesos. https://www.inegi.org.mx/programas/pibent/2013/#Datos_abiertos,
+Construcción propia,pib_percapita_edo,pib_edo/pobtot_edo,
