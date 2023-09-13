@@ -38,4 +38,44 @@ Budget account data was collected from public statistical records concerning pub
 
 To establish a metric for corruption in local governments, we utilize the National Survey of Government Quality and Impact (ENCIG), a biennial survey containing questions related to the incidence and perception of corruption among the population in 246 municipalities. We use data from the surveys conducted closest to the years covered by the budget account data (2018 to 2021); hence, surveys from 2017, 2019, and 2021 were selected.
 
+### Population census data
+
+To provide contextual variables for the analysis, we have included census data from the most recent population census conducted in the year 2020. This data is especially appropriate as it aligns precisely with the timeframe of interest. Some examples of categories of contextual variables that we have selected include municipality size (in terms of population), the labor status of the population, social security status, access to public services, as well as the education and income levels of the population.
+
+### Preprocessing
+
+First we constructed some indicators of Finantial Sustainablity, which are the followings:
+
+#### Cash Solvency
+
+$$
+\begin{table}[H]
+    \caption{Cantidad de fugas detectadas y reparadas en la ciudad de # Aguascalientes durante el periodo 2020 - 2022}
+    \centering
+        \begin{tabular}{|c c c|}
+        \hline
+            Dimension & Financial Indicator &  Definition  \\
+         \hline
+            \multirow{4}{4em}{Cash solvency} & Revenue per capita & Total revenue/Population assets \\
+            & Total general fund revenues from own sources & Unassigned fund / Total general fund sources \\
+            & Proportion of intergovernmental revenues & Intergovernmental revenues/Total revenues \\
+            & Proportion of property tax & Property tax / Total revenues
+        \hline
+            \multirow{2}{4em}{2021} & FTA & 10,172 & 7,861 \\
+                                    & FTC & 373    & 306  \\
+        \hline
+            \multirow{2}{4em}{2022} & FTA & 10,064 & 7,863 \\
+                                    & FTC & 267    & 207  \\
+        \hline
+            \multirow{2}{4em}{Total} & FTA & 30,020 & 21,765 \\
+                                     & FTC & 1,235  & 985  \\
+        \hline
+        \end{tabular}
+    \begin{minipage}{15cm}
+        \vspace{0.2cm}
+        \footnotesize Elaboración propia con base en los datos proporcionados por la concesionaria de agua del municipio de Aguascalientes.
+    \end{minipage}
+    \label{tab:fugas_dist}
+\end{table}
+$$
 ## References
