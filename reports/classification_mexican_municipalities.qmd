@@ -1,0 +1,41 @@
+---
+title: "Classifying Mexican Municipalities as Prone or Non-Prone to Corruption through Machine Learning Techniques"
+author:
+- "Research assistant: Erick Gabriel Fajardo Martínez"
+- "Researcher: Dr. Gabriel Purón Cid"
+format: pdf
+bibliography: references.bib
+mainfont: "Calibri"
+---
+
+## Context 
+
+### Machine Learning and its role in government
+
+Machine learning (ML) algorithms can help governments to make better decisions, improve public services, and increase efficiency. Governments can use ML to analyze large amounts of data, identify patterns and trends, and make predictions. ML can also help governments to automate routine tasks, such as data entry and processing, freeing up staff time for more complex tasks [@veale]. However, the use of ML in government also poses challenges, such as ensuring ethical and transparent governance frameworks, addressing issues of bias and discrimination, and ensuring that the benefits of ML are distributed equitably [@rodolfa].
+
+Some examples of the use of ML in government decisions and execution of public policies include the identification of police officers who have a high risk of having an adverse incident [@ackerman], prediction of risk assesment in child protective services [@cuccaro], and increasing the beneficiares of a tax rebate program by implementing a selection model [@andini].
+
+### Corruption in tax revenue and public expenditure
+
+Corruption associated with budgeting and financial management in governement is one of the most concerning types and most difficults to detect [@puron]. According to Ajaz and Ahmad [-@ajaz], this type of corruption is present in tax revenue either because of tax evation, which is incentivated by high tax ratios, complex tax systems, and insufficiently strong penalties for corrupt acts. On the other hand, corruption is present in budget planning and public expenditure by channeling resources towards areas where spending can be inflated or where there is a higher likelihood of generating commissions [@ghosh]. Besides, corruption also has effects on government debt, as demonstrated in @moldogaziev, their results indicate that corruption has a negative relationship with market prices of public debt.
+
+While it is widely acknowledged that corruption exists within tax revenue and public expenditure procedures, its detection poses significant challenges. These challenges arise from factors such as a lack of transparency and accountability, the intricate nature of government budgets, as well as cultural and social influences, among others.
+
+has the potential to be an effective approach for detecting corruption in public finance due to the strong relationship between corrupt activities and public financial data, as well as the capability of ML techniques to identify patterns within data.
+
+## Objective
+
+Implement ML algorithms to classify mexican municipalities as prone or non-prone to corruption using budget account data. 
+
+## Data 
+
+### Budget account data
+
+Budget account data was collected from public statistical records concerning public expenditures and incomes for nearly all Mexican municipalities (1,978 out of 2,455) spanning the years 2018 to 2021. This dataset comprises information regarding total income, planned budgets, and public debt.
+
+### Corruption data
+
+To establish a metric for corruption in local governments, we utilize the National Survey of Government Quality and Impact (ENCIG), a biennial survey containing questions related to the incidence and perception of corruption among the population in 246 municipalities. We use data from the surveys conducted closest to the years covered by the budget account data (2018 to 2021); hence, surveys from 2017, 2019, and 2021 were selected.
+
+## References
