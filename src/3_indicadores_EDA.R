@@ -27,7 +27,7 @@ indicadores_fs %>%
 
 # Estadística descriptiva de los indicadores
 indicadores_fs %>%
-  select(-mun_inegi) %>%
+  select(-c("nom_ent", "nom_mun", "mun_inegi", "mun_tipo", "gm_2020")) %>%
   pivot_longer(names_to = "indicador", values_to = "valor", cols = -anio) %>%
   group_by(anio, indicador) %>%
   summarise(min = min(valor, na.rm = TRUE),  
