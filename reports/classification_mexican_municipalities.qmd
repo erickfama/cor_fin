@@ -3,7 +3,7 @@ title: "Classifying Mexican Municipalities as Prone or Non-Prone to Corruption t
 author:
 - "Research assistant: Erick Gabriel Fajardo Martínez"
 - "Researcher: Dr. Gabriel Purón Cid"
-format: pdf
+format: html
 bibliography: references.bib
 mainfont: "Calibri"
 ---
@@ -40,24 +40,25 @@ Implement ML algorithms to classify mexican municipalities as prone or non-prone
 
 [Scripts: `1_lectura`, `2_limpieza_efipem`]
 
-Budget account data was collected from public statistical records concerning public expenditures and incomes for nearly all Mexican municipalities (1,978 out of 2,455) spanning the years 2018 to 2021. This dataset comprises information regarding total income, planned budgets, and public debt.
+Budget account data was collected from public statistical records concerning public expenditures and incomes for nearly all Mexican municipalities (2121 out of 2,455) for the year 2019. This dataset comprises information regarding total income, planned budgets, and public debt.
 
 ### Corruption data
 
 [Script: `2_limpieza_encig19`]
 
-To establish a metric for corruption in local governments, we utilize the National Survey of Government Quality and Impact (ENCIG), a biennial survey containing questions related to the quality of the attention, and services provided by the government, as well as the level of confidence government institutions inspire among the population. We use data from the surveys conducted closest to the years covered by the budget account data (2018 to 2021); hence, surveys from 2017, 2019, and 2021 were selected, each containing information from a sample size of 246 municipalities. 
+To establish a metric for corruption in local governments, we utilize the National Survey of Government Quality and Impact (ENCIG), a biennial survey containing questions related to the quality of the attention, and services provided by the government, as well as the level of confidence government institutions inspire among the population. We use data from the survey conducted in the year 2019. It contains information from a sample size of 246 municipalities. 
 
 ENCIG survey contains some key questions regarding the perception and incidence of corruption reported by the population of each municipality. We calculated to corruption measures: 1) Incidence of corruption which is represented by the proportion of the population who reported having been asked, tried, or done from a government employee for money or any personal benefit in the survey year, and 2) Perception of corruption, which is the proportion of the population who reported a strong sense of corruption acts in their State government.
 
-Figure 1 shows the distribution of calculated proportions for each year of the survey and each class of measure (incidence and perception). It can be observed that the incidence measure is more concentrated around the 0% to 25% interval, whereas the perception measure is more dispersed across all values figuring a normal distribution.
+Figure 1 shows the distribution of calculated proportions for each class of measure (incidence and perception). It can be observed that the incidence measure is more concentrated around the 0% to 25% interval, whereas the perception measure is more dispersed across all values figuring a normal distribution.
 
 ```{r echo = FALSE, message=FALSE}
 #| fig-cap: "Distribution of corruption measures"
 
-indicadores_fs <- read_csv(here::here("./data/3_final/indicadores_fs.csv"))
+indicadores_fs <- read_csv(here::here("./data/3_final/indicadores_fs.csv")) %>%
+  filter(anio == 2019)
 
-f1_corrup_hist <- indicadores_fs %>% 
+indicadores_fs %>% 
   select(mun_inegi, starts_with("prop")) %>% 
   pivot_longer(cols = -mun_inegi, names_to = "corrup_measure", values_to = "prop") %>%
   mutate(year = str_extract(corrup_measure, "\\d+$"),
@@ -71,11 +72,7 @@ f1_corrup_hist <- indicadores_fs %>%
        caption = "Note: inc = incidence, per = perception\n
                   Own elaboration.") + 
   theme_bw()
-
-f1_corrup_hist
 ```
-
-
 
 ### Population census data
 
@@ -91,7 +88,7 @@ To provide contextual variables for the analysis, we have included census data f
 
 Financial sustainability (FS) is an important factor to consider in corruption detection due to its tendency to reflect the influence of corruption on the fiscal and financial conditions of governments. As stated in Puron-Cid [-@puron, pp. 65], "FS is a framework to assess how governments meet their financial obligations using different ratios and indicators in five dimensions: cash solvency, budget solvency, long‐term solvency, service‐level solvency for revenues, and the service‐level solvency for expenses". In other words, FS reflects
 
-Therefore, we constructed some FS indicators for 3 out of the 5 FS dimensions to serve as input features for the ML algorithms. The idea behind it is that the ML model learns to detect the patterns of FS conditions in municipalities where the incidence of corruption has been very high.
+Therefore, we constructed some FS indicators for 3 out of the 5 FS dimensions to serve as input features for the ML algorithms. The idea behind it is that the ML model learns to detect the patterns of FS conditions and budget account data in municipalities where the incidence of corruption has been very high.
 
 The constructed FS indicators are the followings:
 
@@ -141,15 +138,17 @@ The constructed FS indicators are the followings:
 
 #### Complete dataset
 
-The complete dataset is formed by integrating budget account data, corruption measures derived from the ENCIG survey, contextual data (population census and derived information from it), and FS indicators. The resulting dataset contains 8,490 observations and 65 variables. The primary key used to merge all the individual datasets was the unique ID of each municipality.
+The complete dataset is formed by integrating budget account data, corruption measures derived from the ENCIG survey, contextual data (population census and derived information from it), and FS indicators. The resulting dataset contains `r nrow(indicadores_fs)` observations and `r ncol(indicadores_fs)` variables. The primary key used to merge all the individual datasets was the unique ID of each municipality.
 
 ## Exploratory Data Analysis
 
 [Script: `3_indicadores_EDA`]
 
-Figure 2 displays the count of missing values per variable. It is evident that the corruption measure variables consistently have the highest count of missing values every year. This is attributed to the small sample size of the ENCIG survey, covering approximately 246 municipalities.
+Figure 2 displays the count of missing values per variable. It is evident that the corruption measure variables consistently have the highest count of missing values every year. This is attributed to the small sample size of the ENCIG survey, which covers 246 municipalities.
 
 Among other variables with missing values are certain FS indicators. This is primarily due to the absence of budget account records for specific municipalities, particularly in the realm of public debt.
+
+To treat these missing values regarding the FS indicators, we impute in place the missing values for the median of each corresponding FS indicator. For the case of the incidence corruption measure (`prop_corrup_inc19`) and (`prop_corrup_inc19`) we didn't impute any missing value due to: 1) small sample size of 246 municipalities, and 2) those are the features that we are indirectly trying to predict.  
 
 ```{r, echo=FALSE}
 #| fig-cap: "Missing values per variable and by year"
@@ -173,8 +172,8 @@ indicadores_fs %>%
                                .default = 1)) %>%
   filter(NA_count > 0 & !str_detect(indicador, "prop_corrup5") & prop_year != 0) %>%
   ggplot(aes(NA_count, indicador, col = as.factor(anio), fill = as.factor(anio))) +
-  geom_col(width = 0.08, show.legend = FALSE) +
-  geom_point(col = "black", show.legend = FALSE) + 
+  geom_col(width = 0.05, show.legend = FALSE) +
+  geom_point(col = "black", show.legend = FALSE, size = 2) + 
   scale_color_discrete(name = "Clase indicador") +
   facet_wrap(~anio) +
   labs(x = "Missing values",
@@ -185,10 +184,10 @@ indicadores_fs %>%
 
 Table 1 presents descriptive statistics for each variable corresponding to the year 2018. It's noteworthy that the corruption measure using incidence (prop_corrup_inc17) is less dispersed compared to the corruption measure using perception (prop_corrup_per17). This disparity can be attributed to the subjectivity of people's perceptions, which may not accurately represent reality or can be influenced.
 
-On the other hand, the incidence measure is considered more reliable as it is based on actual reported incidents—people reporting their involvement or witnessing a corruption act. Therefore, we will utilize the incidence measure for the classification of Mexican municipalities.
+On the other hand, the incidence measure is considered more reliable as it is based on actual reported incidents—people reporting their involvement or witnessing a corruption act. Therefore, we will utilize the incidence proportion measure to build the target feature for the classification of Mexican municipalities.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-#| tbl-cap: "Descriptive statistics of 2018 variables"
+#| tbl-cap: "Descriptive statistics of the complete dataset"
 
 indicadores_fs %>%
   select(-c("nom_ent", "nom_mun", "mun_inegi", "mun_tipo", "gm_2020")) %>%
@@ -198,7 +197,7 @@ indicadores_fs %>%
             mean = mean(valor, na.rm = TRUE),
             max = max(valor, na.rm = TRUE),
             sd = sd(valor, na.rm = TRUE)) %>%
-  filter(!is.na(sd) & anio == 2018 & !str_detect(indicador, "^prop_corrup5")) %>%
+  filter(!is.na(sd) & anio == 2019 & !str_detect(indicador, "^prop_corrup5")) %>%
   mutate(indicador = ifelse(str_detect(indicador, "_y_otras_[a-z]+"), str_remove(indicador, "_y_otras_[a-z]+"), indicador)) %>%
   gt() %>%
   cols_label(indicador = "Variable",
@@ -210,6 +209,48 @@ indicadores_fs %>%
   fmt_number(decimals = 2, suffixing = TRUE) 
 ```
 
+### Target feature
 
+The target feature consists on a binary class variable, which indicates if a municipality is prone to corruption acts or non-prone to corruption acts. Table 2 shows the class value and label of each class:
+
+| Class | Value | Label |
+| ----- | ----- | ----- |
+| Prone to corruption acts | 1 | corrupted |
+| Non-prone to corruption acts | 0 | not-corrupted |
+
+The classification was done by determining a threshold of the proportion of the population who reported having been asked, tried, or done from a government employee for money or any personal benefit (incidence of corruption measure), and classifying municipalities into "corrupted" if their incidence of corruption measure exceeded the threshold, and into not-corrupted otherwise. 
+
+The threshold was established using the mean of the distribution of the incidence of corruption measure, which has a value of `r round(mean(indicadores_fs$prop_corrup_inc19, na.rm = TRUE), 2)/100`. Therefore, every municipality that has a proportion of their population who reported have been involved or witnessed a corruption act greater than `r round(mean(indicadores_fs$prop_corrup_inc19, na.rm = TRUE), 2)/100` is classified as "corrupted", "not-corrupted" otherwise. 
+
+## ML approach
+
+To build the ML model we decided to implement a Random Forest Classifier because of their capability of obtaining the relevance of each feature variable. 
+
+We trained several instances of the Ranfom Forest Classifier utilizing different subsets of our complete dataset, in terms of selected variables, and one particular configuration of municipalities. The reason for this was that we wanted to evaluate the performance of the model given different kind of information inputs. The subsets include: one that only includes budget account data, other subset that includes budget account data and population census data, and finally the complete dataset, which contains budget account data, population census data, and FS indicators.
+
+The three aforementioned datasets address a particular configuration of municipalities. The reason for this is that we only could create a classification for the 246 that were part of ENCIG survey sample. Data from the remaining `r nrow(indicadores_fs) - 246` municipalities were used after the deployment of the final ML model to showcase the potential utility of this approach.
+
+### Training and test datasets
+
+To create the train and test datasets, first we filter our complete dataset to have only the municipalities which had a value of incidence of corruption measure resulting in `r sum(!is.na(indicadores_fs$prop_corrup_inc19))` observations. Then we created our feature variable by applying the rule we previously described regarding the incidence of corruption threshold. Finally, we normalize our training features by scaling them between the range (0, 1), and splitted the dataset into 80% training and 20% test. 
+
+The distribution of classes in both datasets are described in table 3. 
+
+| Class | Dataset | Total |
+| ----- | ------- | ----- |
+| 1 - Corrupted | Train | 92 |
+| 1 - Corrupted | Test  | 22 |
+| 0 - Not corrupted | Train | 94 |
+| 0 - Not corrupted | Test | 25 |
+
+### Training of the ML algorithm
+
+We chose to train a base model utilizing the complete dataset (budget account data + population census data + FS indicators) to serve as comparison for the other trained models. Then, we proceeded to train the other models and performed an hyperparameter-tuning by applying randomized grid search. After we successfully finded the best parameter for each model we proceeded to evaluate each of them with the test sets.
+
+## Results
+
+
+
+### 
 
 ## References

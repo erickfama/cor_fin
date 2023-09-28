@@ -184,7 +184,7 @@ print("F1 medio: ", mean(f1_rf))
 
 # Evaluacion final
 y_pred_final = CLF_rf[0].predict(X_test)
-
+print("RANDOM FOREST EVALUATION\n")
 print(classification_report(y_test, y_pred_final))
 
 # Use sklearn to export the tree 
